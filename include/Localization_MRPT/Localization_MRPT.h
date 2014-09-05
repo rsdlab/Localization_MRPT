@@ -26,6 +26,7 @@
 
 // Service Consumer stub headers
 // <rtc-template block="consumer_stub_h">
+#include "MobileRobotStub.h"
 
 // </rtc-template>
 
@@ -257,6 +258,9 @@ class Localization_MRPT
 
   // CORBA Port declaration
   // <rtc-template block="corbaport_declare">
+  /*!
+   */
+  RTC::CorbaPort m_mapServerPort;
   
   // </rtc-template>
 
@@ -267,6 +271,9 @@ class Localization_MRPT
 
   // Consumer declaration
   // <rtc-template block="consumer_declare">
+  /*!
+   */
+  RTC::CorbaConsumer<RTC::OGMapServer> m_mapServer;
   
   // </rtc-template>
 

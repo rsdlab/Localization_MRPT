@@ -12,6 +12,8 @@
 #   --module-act-type=PERIODIC --module-max-inst=1 
 #   --config=debug:int:0 
 #   --inport=range:RTC::RangeData --inport=odometry:RTC::TimedPose2D --outport=estimatedPose:RTC::TimedPose2D 
+#   --consumer-idl=C:\Users\ysuga\rtm\idl\MobileRobot.idl 
+#   --consumer=mapServer:OGMapServer:RTC::OGMapServer 
 
 
 ======================================================================
@@ -136,6 +138,18 @@ Lang Type:
     Service Port definition
 ======================================================================
 # <rtc-template block="serviceport">
+	PortName:    mapServer
+	Description: 
+	Interface:   
+		[Service Consumer Interfaces]
+		Name:          OGMapServer
+		Type:          RTC::OGMapServer
+		Description:   
+		Argument:      
+		Return Value:  
+		Exception:     
+		PreCondition:  
+		PostCondition: 
 # </rtc-template> 
 
 ======================================================================

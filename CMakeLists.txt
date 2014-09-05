@@ -57,6 +57,9 @@ endif(${OpenRTM_FOUND})
 # Universal settings
 #enable_testing()
 
+find_package(MRPT REQUIRED base obs gui slam hwdrivers maps)
+
+
 # Subdirectories
 add_subdirectory(cmake)
 if(BUILD_DOCUMENTATION)

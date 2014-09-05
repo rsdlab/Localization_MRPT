@@ -42,7 +42,8 @@ Localization_MRPT::Localization_MRPT(RTC::Manager* manager)
   : RTC::DataFlowComponentBase(manager),
     m_rangeIn("range", m_range),
     m_odometryIn("odometry", m_odometry),
-    m_estimatedPoseOut("estimatedPose", m_estimatedPose)
+    m_estimatedPoseOut("estimatedPose", m_estimatedPose),
+    m_mapServerPort("mapServer")
 
     // </rtc-template>
 {
@@ -71,8 +72,10 @@ RTC::ReturnCode_t Localization_MRPT::onInitialize()
   // Set service provider to Ports
   
   // Set service consumers to Ports
+  m_mapServerPort.registerConsumer("OGMapServer", "RTC::OGMapServer", m_mapServer);
   
   // Set CORBA Service Ports
+  addPort(m_mapServerPort);
   
   // </rtc-template>
 
