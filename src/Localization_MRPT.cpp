@@ -56,7 +56,7 @@ Localization_MRPT::~Localization_MRPT()
 {
 }
 
-
+static OGMap ogmap;
 
 RTC::ReturnCode_t Localization_MRPT::onInitialize()
 {
@@ -110,7 +110,11 @@ RTC::ReturnCode_t Localization_MRPT::onShutdown(RTC::UniqueId ec_id)
 
 
 RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
-{
+{  //Load OGMap
+  OGMap_out ogmap = new OGMap();
+  if(m_mapServer->requestCurrentBuiltMap(ogmap) == RETVAL_OK){
+    return RTC::RTC_OK;
+  }
   return RTC::RTC_OK;
 }
 
@@ -123,9 +127,73 @@ RTC::ReturnCode_t Localization_MRPT::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
 {
+  TimedPose2D currentPose;
+  RangeData range;
+
+  if(m_odometryIn.isNew()){
+	  m_odometryIn.read();
+	  currentPose = m_odometry;
+  }
+  if(m_rangeIn.isNew()){
+	  m_rangeIn.read();
+	  range = m_range;
+  }
+  OGMap ogmap;
+  //get OGMAP
+
+  COccupancyGridMap2D theMap;
+  OGMapToCOccupancyGridMap(ogmap, &theMap);
+
+  double xmin = theMap.getXMin();
+  double xmax = theMap.getXMax();
+  double ymin = theMap.getYMin();
+  double ymax = theMap.getYMax();
+
+  CMonteCarloLocalization2D pdf;
+  pdf.resetUniformFreeSpace(&theMap, 0.7, -1, xmin,xmax,ymin,ymax, 0, 2*M_PI);
+
+
+  pdf.computeResampling(
+	  CParticleFilter::TParticleResamplingAlgorithm.prMultinomial,
+	  //pdf.m_particles.getW(particles.size()),
+	  ,
+	  particles.size());
+	  
+  
+
+  m_estimatedPose = computeEstimatedPose(&ogmap, currentPose, range, &pdf);
+
+  m_estimatedPoseOut.write();
+
   return RTC::RTC_OK;
 }
 
+TimedPose2D computeEstimatedPose(OGMap* map, TimedPose2D currentPose, RangeData range, CMonteCarloLocalization2D* pdf){
+	TimedPose2D estimatedPose;
+	return estimatedPose;
+}
+
+void OGMapToCOccupancyGridMap(RTC::OGMap ogmap, COccupancyGridMap2D *gridmap) {
+	gridmap->setSize(0, ogmap.map.width, 0, ogmap.map.height, 1, 0.5f);
+	int height = gridmap->getSizeY();
+	int width =  gridmap->getSizeX();
+
+	for(int i=0; i <height ; i++){
+		for(int j=0; j <width ; j++){
+			int cell = ogmap.map.cells[i * width + j];
+	
+			if(cell < 100){
+				gridmap->setCell(j, i, 0.0);
+			}
+			else if(cell > 200){
+				gridmap->setCell(j, i, 1.0);
+			}
+			else{
+				gridmap->setCell(i, j, 0.5);
+			}
+		}
+	}
+}
 /*
 RTC::ReturnCode_t Localization_MRPT::onAborting(RTC::UniqueId ec_id)
 {
