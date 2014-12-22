@@ -23,8 +23,11 @@
 #include <mrpt/bayes/CParticleFilter.h>
 #include <mrpt/slam/COccupancyGridMap2D.h>
 
-using namespace mrpt;
-using namespace mrpt::slam;
+#include <mrpt/slam/CActionCollection.h>
+#include <mrpt/slam/CSensoryFrame.h>
+//#include <mrpt/bayes/CParticleFilter.h>
+
+#include <mrpt/slam/CObservation2DRangeScan.h>
 
 using namespace RTC;
 using namespace mrpt;
