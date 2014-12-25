@@ -9,6 +9,8 @@
 
 #include "Localization_MRPT.h"
 
+#include "MonteCarloLocalization.h"
+
 // Module specification
 // <rtc-template block="module_spec">
 static const char* localization_mrpt_spec[] =
@@ -32,11 +34,13 @@ static const char* localization_mrpt_spec[] =
     ""
   };
 // </rtc-template>
-
 /*!
  * @brief constructor
  * @param manager Maneger Object
  */
+
+ssr::Pose2D CurrentPose, m_OldPose, deltaPose;
+
 Localization_MRPT::Localization_MRPT(RTC::Manager* manager)
     // <rtc-template block="initializer">
   : RTC::DataFlowComponentBase(manager),
@@ -44,10 +48,9 @@ Localization_MRPT::Localization_MRPT(RTC::Manager* manager)
     m_odometryIn("odometry", m_odometry),
     m_estimatedPoseOut("estimatedPose", m_estimatedPose),
     m_mapServerPort("mapServer")
-
-    // </rtc-template>
 {
 }
+    // </rtc-template>
 
 /*!
  * @brief destructor
@@ -107,29 +110,25 @@ RTC::ReturnCode_t Localization_MRPT::onShutdown(RTC::UniqueId ec_id)
   return RTC::RTC_OK;
 }
 */
+      
 
- COccupancyGridMap2D theMap;
- CMonteCarloLocalization2D pdf;
+ssr::MCLocalization_MRPT mcl;
 
 RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
-{  //Load OGMap
-  OGMap_out ogmap = new OGMap();
-  if(m_mapServer->requestCurrentBuiltMap(ogmap) == RETVAL_OK){
-    OGMapToCOccupancyGridMap(*ogmap, &theMap);
+{
+  //Load OGMap
+  OGMap ogmap;
+  OGMap_out ogmap_out = new RTC::OGMap();
 	
-    double xmin = theMap.getXMin();
-    double xmax = theMap.getXMax();
-    double ymin = theMap.getYMin();
-    double ymax = theMap.getYMax();
+  m_mapServer->requestCurrentBuiltMap(ogmap_out);
+  
+  mcl.setMap(ogmap);
 
-	pdf.resetUniformFreeSpace(&theMap, 0.7, -1, xmin,xmax,ymin,ymax, 0, 2*M_PI);
-
-
-    return RTC::RTC_OK;
-  }
+  mcl.initialize();
+  
   return RTC::RTC_OK;
-}
 
+}
 
 RTC::ReturnCode_t Localization_MRPT::onDeactivated(RTC::UniqueId ec_id)
 {
@@ -138,90 +137,33 @@ RTC::ReturnCode_t Localization_MRPT::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
 {
-  TimedPose2D currentPose;
-  RangeData range;
-
   if(m_odometryIn.isNew()){
 	  m_odometryIn.read();
-	  currentPose = m_odometry;
+	  ssr::Pose2D CurrentPose(m_odometry.data.position.x, m_odometry.data.position.y, m_odometry.data.heading);
+      ssr::Pose2D deltaPose = CurrentPose - m_OldPose;	  
+	  m_OldPose = CurrentPose;
+	  mcl.addPose(deltaPose);
   }
   if(m_rangeIn.isNew()){
 	  m_rangeIn.read();
-	  range = m_range;
+	  ssr::Range range(&(m_range.ranges[0]), m_range.ranges.length(), m_range.config.maxAngle - m_range.config.minAngle);
+	  mcl.addRange(range);
   }
-  //initilize LRF atode activate ni utusu
-  CObservation2DRangeScan CRange;
-  CRange.sensorPose.setFromValues(
-      range.geometry.geometry.pose.position.x,
-	  range.geometry.geometry.pose.position.y,
-	  range.geometry.geometry.pose.position.z,
-	  range.geometry.geometry.pose.orientation.y,
-	  range.geometry.geometry.pose.orientation.p,
-	  range.geometry.geometry.pose.orientation.r
-  );
-  //CRange.validRange
-  CRange.aperture = (0.36*M_PI)/180;//add configuration in future
-
-  for(int i=0; i<range.ranges.length(); i++){
-	  CRange.scan[i] = range.ranges[i];
-  }
-
-
-  mrpt::vector_double in_logWeights;
-  pdf.getWeights(in_logWeights);
-
-  vector<size_t> out_indexes;
-  out_indexes.empty();
+    CPose2D estPose;
+    estPose = mcl.getEstimatedPose();
   
-  //resampling
-  pdf.computeResampling(
-	  CParticleFilter::TParticleResamplingAlgorithm.prMultinomial,
-	  in_logWeights,
-	  out_indexes,
-	  pdf.size());
+	m_estimatedPose.data.position.x =  estPose.x();
+	m_estimatedPose.data.position.y = estPose.y();
+	m_estimatedPose.data.heading = estPose.phi();
 
-  //prediction
-  CActionCollection action;
-  CSensoryFrame sensor;
-  CParticleFilter::TParticleFilterOptions option;
-  option.PF_algorithm;
-  pdf.prediction_and_update(&action, &sensor, option);
-  
-  //weighting
-  CPose2D CCurrentPose(0,0,0);
-  pdf.PF_SLAM_computeObservationLikelihoodForParticle(option,pdf.size(), sensor,CCurrentPose);
-
-  //measure
-  //pdf.getMean(CCurrentPose);
-
-  //m_estimatedPose = CCurrentPose;
-  m_estimatedPoseOut.write();
+	m_estimatedPoseOut.write();
 
   return RTC::RTC_OK;
 }
 
 
-void OGMapToCOccupancyGridMap(RTC::OGMap ogmap, COccupancyGridMap2D *gridmap) {
-	gridmap->setSize(0, ogmap.map.width, 0, ogmap.map.height, 1, 0.5f);
-	int height = gridmap->getSizeY();
-	int width =  gridmap->getSizeX();
 
-	for(int i=0; i <height ; i++){
-		for(int j=0; j <width ; j++){
-			int cell = ogmap.map.cells[i * width + j];
-	
-			if(cell < 100){
-				gridmap->setCell(j, i, 0.0);
-			}
-			else if(cell > 200){
-				gridmap->setCell(j, i, 1.0);
-			}
-			else{
-				gridmap->setCell(i, j, 0.5);
-			}
-		}
-	}
-}
+
 /*
 RTC::ReturnCode_t Localization_MRPT::onAborting(RTC::UniqueId ec_id)
 {

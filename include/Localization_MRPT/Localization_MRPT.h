@@ -19,19 +19,21 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <mrpt/slam/CMonteCarloLocalization2D.h>
-#include <mrpt/bayes/CParticleFilter.h>
-#include <mrpt/slam/COccupancyGridMap2D.h>
-
-#include <mrpt/slam/CActionCollection.h>
-#include <mrpt/slam/CSensoryFrame.h>
-//#include <mrpt/bayes/CParticleFilter.h>
-
-#include <mrpt/slam/CObservation2DRangeScan.h>
-
+#include <mrpt/base.h>
+#include <mrpt/slam.h>
+#include <mrpt/gui.h>
 using namespace RTC;
+
 using namespace mrpt;
 using namespace mrpt::slam;
+using namespace mrpt::opengl;
+using namespace mrpt::gui;
+using namespace mrpt::math;
+using namespace mrpt::system;
+using namespace mrpt::utils;
+using namespace mrpt::random;
+using namespace std;
+
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
