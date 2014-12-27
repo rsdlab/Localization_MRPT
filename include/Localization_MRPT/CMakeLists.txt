@@ -1,4 +1,4 @@
-set(hdrs Localization_MRPT.h MonteCarloLocalization.h
+set(hdrs Localization_MRPT.h MonteCarloLocalization.h mrpt_localization_core.h
     PARENT_SCOPE
     )
 

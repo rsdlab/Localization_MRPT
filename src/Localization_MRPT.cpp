@@ -8,7 +8,6 @@
  */
 
 #include "Localization_MRPT.h"
-
 #include "MonteCarloLocalization.h"
 
 // Module specification
@@ -75,7 +74,7 @@ RTC::ReturnCode_t Localization_MRPT::onInitialize()
   // Set service provider to Ports
   
   // Set service consumers to Ports
-  m_mapServerPort.registerConsumer("OGMapServer", "RTC::OGMapServer", m_mapServer);
+  m_mapServerPort.registerConsumer("mapServer", "RTC::OGMapServer", m_mapServer);
   
   // Set CORBA Service Ports
   addPort(m_mapServerPort);
@@ -117,13 +116,11 @@ ssr::MCLocalization_MRPT mcl;
 RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
 {
   //Load OGMap
-  OGMap ogmap;
-  OGMap_out ogmap_out = new RTC::OGMap();
-	
-  m_mapServer->requestCurrentBuiltMap(ogmap_out);
+  OGMap* ogmap = new OGMap();
+  m_mapServer->requestCurrentBuiltMap(ogmap);
   
-  mcl.setMap(ogmap);
-
+  //initilize PF
+  mcl.setMap(*ogmap);
   mcl.initialize();
   
   return RTC::RTC_OK;
@@ -151,11 +148,11 @@ RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
   }
     CPose2D estPose;
     estPose = mcl.getEstimatedPose();
-  
-	m_estimatedPose.data.position.x =  estPose.x();
-	m_estimatedPose.data.position.y = estPose.y();
+   
+	m_estimatedPose.data.position.x =  (estPose.x()-199) * 0.05;
+	m_estimatedPose.data.position.y = (estPose.y()-199 ) * 0.05;
 	m_estimatedPose.data.heading = estPose.phi();
-
+	
 	m_estimatedPoseOut.write();
 
   return RTC::RTC_OK;

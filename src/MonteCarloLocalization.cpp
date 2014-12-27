@@ -1,7 +1,7 @@
 #include "MonteCarloLocalization.h"
 
-		
 using namespace ssr;
+
 
 MCLocalization_MRPT::MCLocalization_MRPT(){
 	//constractor 
@@ -12,18 +12,17 @@ MCLocalization_MRPT::~MCLocalization_MRPT(){
 }
 
 void  MCLocalization_MRPT::setMap(const OGMap& map){
-	OGMap2COccupancyGridMap(map, &theMap);
+	OGMap2COccupancyGridMap(map, &m_ogmap);
 }
 void  MCLocalization_MRPT::initialize(){
-
-    pdf.options.metricMap = &theMap;
+    pdf_.options.metricMap = &m_ogmap;
+	m_ActionCollection.clear();
+	m_SensoryFrame.clear();
 
 	//////////////////////////////
 	//have to create MRPT config file
 	//////////////////////////////
 
-	//CParticleFilter::TParticleFilterOptions		pfOptions;
-	//pfOptions.loadFromConfigFile( iniFile, "PF_options" );
 	//pfOptions.PF_algorithm = CParticleFilter::TParticleFilterAlgorithm.pfStandardProposal;
 	//pfOptions.resamplingMethod = CParticleFilter::TParticleResamplingAlgorithm.prMultinomial;
 	pfOptions.adaptiveSampleSize = 1;
@@ -31,33 +30,30 @@ void  MCLocalization_MRPT::initialize(){
 	pfOptions.BETA = 0.;
 	pfOptions.sampleSize = 1;
 
-
-	//TMonteCarloLocalizationParams	pdfPredictionOptions;
-	//pdfPredictionOptions.KLD_params.loadFromConfigFile( iniFile, "KLD_options");
-	pdf.options.KLD_params.KLD_binSize_PHI=10;
-	pdf.options.KLD_params.KLD_binSize_XY=0.10;
-	pdf.options.KLD_params.KLD_delta = 0.01;
-	pdf.options.KLD_params.KLD_epsilon =0.01;
-	pdf.options.KLD_params.KLD_maxSampleSize = 40000;
-	pdf.options.KLD_params.KLD_minSampleSize = 150;
-	pdf.options.KLD_params.KLD_minSamplesPerBin = 0;
+	pdf_.options.KLD_params.KLD_binSize_PHI=10;
+	pdf_.options.KLD_params.KLD_binSize_XY=0.10;
+	pdf_.options.KLD_params.KLD_delta = 0.01;
+	pdf_.options.KLD_params.KLD_epsilon =0.01;
+	pdf_.options.KLD_params.KLD_maxSampleSize = 40000;
+	pdf_.options.KLD_params.KLD_minSampleSize = 150;
+	pdf_.options.KLD_params.KLD_minSamplesPerBin = 0;
 		
-	dummy_odom_params.modelSelection = CActionRobotMovement2D::mmGaussian;
-	dummy_odom_params.gausianModel.minStdXY  = 0.10;
-	dummy_odom_params.gausianModel.minStdPHI = 2.0;
+	motion_model_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
+	motion_model_options_.gausianModel.minStdXY  = 0.10;
+	motion_model_options_.gausianModel.minStdPHI = 2.0;
 
 	/////////
 	/////////
 
-	PF.m_options = pfOptions;
+	pf_.m_options = pfOptions;
 
 	//initialize PDF
 	//
-    double xmin = theMap.getXMin();
-    double xmax = theMap.getXMax();
-    double ymin = theMap.getYMin();
-    double ymax = theMap.getYMax();
-	pdf.resetUniformFreeSpace(&theMap,40000, -1, xmin,xmax,ymin,ymax, 0, 2*M_PI);
+    //double xmin = -100;
+    //double xmax =  100;
+    //double ymin = -100;
+    //double ymax =  100;
+	pdf_.resetUniformFreeSpace(&m_ogmap, 0.7f, -1);
 
 }
 
@@ -98,23 +94,11 @@ bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 }
 
 CPose2D MCLocalization_MRPT::getEstimatedPose(){
-  //resampling
-  pdf.performResampling(pfOptions,0);
+  CPose2D estimatedPose;
 
-  //prediction
-  pdf.prediction_and_update(&m_ActionCollection, &m_SensoryFrame, pfOptions);
+  pf_.executeOn(pdf_,& m_ActionCollection,& m_SensoryFrame, NULL); //&pf_stats_);
   
-  //weihting
-  /*
-  CPose3D CurrentPose3D(CurrentPose.x,CurrentPose.y,CurrentPose.th);
-  pdf.PF_SLAM_computeObservationLikelihoodForParticle(pfOptions, pdf.size(),  m_SensoryFrame, CurrentPose3D);
-  */
-  for(int i=0; i<pdf.size(); i++){
-	  pdf.setW(i, theMap.computeObservationsLikelihood(m_SensoryFrame, pdf.getParticlePose(i)));
-  }
-
-  //measure
-  pdf.getMean(estimatedPose);
+  pdf_.getMean(estimatedPose);
 	
   return estimatedPose;
 }

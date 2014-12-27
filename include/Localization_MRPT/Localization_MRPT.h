@@ -19,19 +19,7 @@
 #include <rtm/idl/ExtendedDataTypesSkel.h>
 #include <rtm/idl/InterfaceDataTypesSkel.h>
 
-#include <mrpt/base.h>
-#include <mrpt/slam.h>
-#include <mrpt/gui.h>
 using namespace RTC;
-
-using namespace mrpt;
-using namespace mrpt::slam;
-using namespace mrpt::opengl;
-using namespace mrpt::gui;
-using namespace mrpt::math;
-using namespace mrpt::system;
-using namespace mrpt::utils;
-using namespace mrpt::random;
 using namespace std;
 
 

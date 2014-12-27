@@ -1,17 +1,8 @@
-#include <rtm/Manager.h>
-#include <rtm/DataFlowComponentBase.h>
-#include <rtm/CorbaPort.h>
-#include <rtm/DataInPort.h>
-#include <rtm/DataOutPort.h>
-#include <rtm/idl/BasicDataTypeSkel.h>
-#include <rtm/idl/ExtendedDataTypesSkel.h>
-#include <rtm/idl/InterfaceDataTypesSkel.h>
+#include "MobileRobotStub.h"
+#include "mrpt_localization_core.h"
 
 #include <mrpt/base.h>
-#include <mrpt/slam.h>
 #include <mrpt/gui.h>
-
-#include "MobileRobotStub.h"
 
 using namespace RTC;
 
@@ -88,7 +79,6 @@ namespace ssr{
 			-dx*sin(pose2.th) + dy*cos(pose2.th),
 			dth);
 	}
-
 
 	/**
 	*
@@ -226,22 +216,23 @@ namespace ssr{
 		}
 	};
 
-
 	/**
 	*
 	*/
-	class MCLocalization_MRPT {
-	private:
-		COccupancyGridMap2D theMap;
-		CMonteCarloLocalization2D pdf;
-		CParticleFilter::TParticleFilterOptions pfOptions;
-		CParticleFilter PF;
-		CActionRobotMovement2D::TMotionModelOptions dummy_odom_params;
+	class MCLocalization_MRPT{
+	public:
+		COccupancyGridMap2D m_ogmap;
+		//CMultiMetricMap m_metricmap;
+		CMonteCarloLocalization2D pdf_;
+		CParticleFilter::TParticleFilterOptions pfOptions;		
+		CParticleFilter::TParticleFilterStats pf_stats_;
+		CParticleFilter pf_;
+		CActionRobotMovement2D::TMotionModelOptions motion_model_options_;
  		mrpt::slam::CActionCollection m_ActionCollection;
 		mrpt::slam::CSensoryFrame m_SensoryFrame;
 		mrpt::poses::CPose3D m_RangeSensorPose;
 		
-		CPose2D estimatedPose;
+		//CPose2D estimatedPose;
 		float m_range_min;
 		float m_range_max;
 
