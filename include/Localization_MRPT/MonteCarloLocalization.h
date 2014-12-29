@@ -1,8 +1,22 @@
 #include "MobileRobotStub.h"
-#include "mrpt_localization_core.h"
+//#include "mrpt_localization_core.h"
 
 #include <mrpt/base.h>
 #include <mrpt/gui.h>
+
+#include <mrpt/bayes/CParticleFilter.h>
+#include <mrpt/slam/CActionRobotMovement2D.h>
+#include <mrpt/slam/CMultiMetricMap.h>
+#include <mrpt/poses/CPose2D.h>
+#include <mrpt/poses/CPosePDFGaussian.h>
+#include <mrpt/utils/CTicTac.h>
+#include <mrpt/slam/CMultiMetricMap.h>
+#include <mrpt/slam/CActionCollection.h>
+#include <mrpt/slam/CMonteCarloLocalization2D.h>
+#include <mrpt/slam/CObservationOdometry.h>
+#include <mrpt/slam/CSensoryFrame.h>
+#include <mrpt/utils/CTicTac.h>
+#include <mrpt/poses/CPose2D.h>
 
 using namespace RTC;
 
@@ -224,14 +238,19 @@ namespace ssr{
 		COccupancyGridMap2D m_ogmap;
 		//CMultiMetricMap m_metricmap;
 		CMonteCarloLocalization2D pdf_;
-		CParticleFilter::TParticleFilterOptions pfOptions;		
+		CParticleFilter::TParticleFilterOptions pfOptions_;		
 		CParticleFilter::TParticleFilterStats pf_stats_;
 		CParticleFilter pf_;
+		//PFStates state_;
+
 		CActionRobotMovement2D::TMotionModelOptions motion_model_options_;
+		CActionRobotMovement2D::TMotionModelOptions motion_model_default_options_;
+
  		mrpt::slam::CActionCollection m_ActionCollection;
 		mrpt::slam::CSensoryFrame m_SensoryFrame;
 		mrpt::poses::CPose3D m_RangeSensorPose;
-		
+		mrpt::poses::CPosePDFGaussian initialPose_;
+
 		//CPose2D estimatedPose;
 		float m_range_min;
 		float m_range_max;
@@ -263,8 +282,8 @@ namespace ssr{
 		CPose2D getEstimatedPose();
 
 	protected:
+		void configureFilter(const mrpt::utils::CConfigFile &_configFile);
 		void OGMap2COccupancyGridMap(RTC::OGMap ogmap, COccupancyGridMap2D *gridmap);
-		
 		void TimedPose2D2CPose2D(const TimedPose2D & tp, CPose2D & cp, const RTC::OGMap & map);
 	};
 

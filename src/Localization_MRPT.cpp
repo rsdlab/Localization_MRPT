@@ -38,7 +38,8 @@ static const char* localization_mrpt_spec[] =
  * @param manager Maneger Object
  */
 
-ssr::Pose2D CurrentPose, m_OldPose, deltaPose;
+ssr::Pose2D CurrentPose, OldPose, deltaPose;
+ssr::MCLocalization_MRPT mcl;
 
 Localization_MRPT::Localization_MRPT(RTC::Manager* manager)
     // <rtc-template block="initializer">
@@ -110,9 +111,6 @@ RTC::ReturnCode_t Localization_MRPT::onShutdown(RTC::UniqueId ec_id)
 }
 */
       
-
-ssr::MCLocalization_MRPT mcl;
-
 RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
 {
   //Load OGMap
@@ -137,8 +135,8 @@ RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
   if(m_odometryIn.isNew()){
 	  m_odometryIn.read();
 	  ssr::Pose2D CurrentPose(m_odometry.data.position.x, m_odometry.data.position.y, m_odometry.data.heading);
-      ssr::Pose2D deltaPose = CurrentPose - m_OldPose;	  
-	  m_OldPose = CurrentPose;
+      ssr::Pose2D deltaPose = CurrentPose - OldPose;	  
+	  OldPose = CurrentPose;
 	  mcl.addPose(deltaPose);
   }
   if(m_rangeIn.isNew()){
@@ -149,8 +147,8 @@ RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
     CPose2D estPose;
     estPose = mcl.getEstimatedPose();
    
-	m_estimatedPose.data.position.x =  (estPose.x()-199) * 0.05;
-	m_estimatedPose.data.position.y = (estPose.y()-199 ) * 0.05;
+	m_estimatedPose.data.position.x = estPose.x();
+	m_estimatedPose.data.position.y = estPose.y();
 	m_estimatedPose.data.heading = estPose.phi();
 	
 	m_estimatedPoseOut.write();
