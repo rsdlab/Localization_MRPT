@@ -59,8 +59,6 @@ Localization_MRPT::~Localization_MRPT()
 {
 }
 
-static OGMap ogmap;
-
 RTC::ReturnCode_t Localization_MRPT::onInitialize()
 {
   // Registration: InPort/OutPort/Service

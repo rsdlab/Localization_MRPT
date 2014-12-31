@@ -49,10 +49,10 @@ void  MCLocalization_MRPT::initialize(){
     motion_model_default_options_.gausianModel.minStdPHI = 2.0;
 	*/
 	
-	float min_x = -0.1;
-    float max_x = 0.1;
-    float min_y = -0.10;
-    float max_y = 0.10;
+	float min_x = -0.01;
+    float max_x =  0.01;
+    float min_y = -0.01;
+    float max_y =  0.01;
     float min_phi = 0;
     float max_phi = 2*M_PI;
 	
@@ -99,17 +99,11 @@ bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 CPose2D MCLocalization_MRPT::getEstimatedPose(){
     pf_.executeOn(pdf_,& m_ActionCollection,& m_SensoryFrame, &pf_stats_);
   
-    CPose2D estPose;
-	pdf_.getMean(estPose);
-	//estPose.x((estPose.x() - (m_map.getSizeX()/2)) * 0.05);//m_map.getResolution());
-	//estPose.y((estPose.y() - (m_map.getSizeY()/2)) * 0.05);//m_map.getResolution());
-
-  return estPose;
+	return pdf_.getMeanVal();
 }
 
 void MCLocalization_MRPT::OGMap2COccupancyGridMap(OGMap ogmap, COccupancyGridMap2D *gridmap) {
 	gridmap->setSize(0-ogmap.map.width*ogmap.config.xScale/2, ogmap.map.width*ogmap.config.xScale/2, 0-ogmap.map.width*ogmap.config.yScale/2, ogmap.map.height*ogmap.config.yScale/2, ogmap.config.xScale);
-	//gridmap->setSize(-10, 10, -10, 10, ogmap.config.xScale);
 	int height = gridmap->getSizeY();
 	int width =  gridmap->getSizeX();
 
