@@ -1,4 +1,4 @@
-set(comp_srcs Localization_MRPT.cpp MonteCarloLocalization.cpp mrpt_localization_core.cpp)
+set(comp_srcs Localization_MRPT.cpp MonteCarloLocalization.cpp)
 set(standalone_srcs Localization_MRPTComp.cpp)
 
 if (DEFINED OPENRTM_INCLUDE_DIRS)

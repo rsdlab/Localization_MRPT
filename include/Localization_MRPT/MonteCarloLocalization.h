@@ -235,7 +235,7 @@ namespace ssr{
 	*/
 	class MCLocalization_MRPT{
 	public:
-		COccupancyGridMap2D m_ogmap;
+		COccupancyGridMap2D m_map;
 		//CMultiMetricMap m_metricmap;
 		CMonteCarloLocalization2D pdf_;
 		CParticleFilter::TParticleFilterOptions pfOptions_;		

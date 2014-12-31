@@ -12,11 +12,11 @@ MCLocalization_MRPT::~MCLocalization_MRPT(){
 }
 
 void  MCLocalization_MRPT::setMap(const OGMap& map){
-	OGMap2COccupancyGridMap(map, &m_ogmap);
+	OGMap2COccupancyGridMap(map, &m_map);
 }
 
 void  MCLocalization_MRPT::initialize(){
-
+	///
 	//pfOptions_.PF_algorithm = CParticleFilter::TParticleFilterAlgorithm.pfStandardProposal;
 	//pfOptions_.resamplingMethod = CParticleFilter::TParticleResamplingAlgorithm.prMultinomial;
 	pfOptions_.adaptiveSampleSize = 1;
@@ -25,10 +25,9 @@ void  MCLocalization_MRPT::initialize(){
 	pfOptions_.sampleSize = 1;
     pfOptions_.dumpToConsole();
  
-
     pf_.m_options = pfOptions_;
 	
-
+	///
 	pdf_.clear();
 	pdf_.options.KLD_params.KLD_binSize_PHI=20;
 	pdf_.options.KLD_params.KLD_binSize_XY=0.20;
@@ -38,8 +37,9 @@ void  MCLocalization_MRPT::initialize(){
 	pdf_.options.KLD_params.KLD_minSampleSize = 150;
 	pdf_.options.KLD_params.KLD_minSamplesPerBin = 0;
 
-    pdf_.options.metricMap = &m_ogmap;
+    pdf_.options.metricMap = &m_map;
 	
+	///
 	motion_model_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
 	motion_model_options_.gausianModel.minStdXY  = 0.10;
 	motion_model_options_.gausianModel.minStdPHI = 2.0;
@@ -48,37 +48,17 @@ void  MCLocalization_MRPT::initialize(){
     motion_model_default_options_.gausianModel.minStdXY  = 0.10;
     motion_model_default_options_.gausianModel.minStdPHI = 2.0;
 	*/
-	/*
-	float min_x = -10.0;
-    float max_x =  10.0;
-    float min_y = -10.0;
-    float max_y =  10.0;
-    float min_phi = -30.0;
-    float max_phi = 210.0;
-	*/
-    pdf_.resetUniformFreeSpace(&m_ogmap, 0.7f, 40000);//,min_x,max_x,min_y,max_y);
+	
+	float min_x = 0;
+    float max_x = 400;
+    float min_y = 0;
+    float max_y = 400;
+    float min_phi = 0;
+    float max_phi = 2*M_PI;
+	
+    pdf_.resetUniformFreeSpace(&m_map, 0.7f, 40000, min_x, max_x, min_y, max_y);
 	
 }
-/*
-void configureFilter(const mrpt::utils::CConfigFile &_configFile) {
-
-
-
-    // PDF Options:
-    // ------------------
-    TMonteCarloLocalizationParams   pdfPredictionOptions;
-    pdfPredictionOptions.KLD_params.loadFromConfigFile( _configFile, "KLD_options");
-	
-    pdf_.clear();
-
-    // PDF Options:
-    pdf_.options = pdfPredictionOptions;
-    //pdf_.options.metricMap = &m_ogmap;
-
-    // Create the PF object:
-    pf_.m_options = pfOptions;
-}
-*/
 
 bool MCLocalization_MRPT::addPose(const ssr::Pose2D& deltaPose)
 {
@@ -121,8 +101,8 @@ CPose2D MCLocalization_MRPT::getEstimatedPose(){
   
     CPose2D estPose;
 	pdf_.getMean(estPose);
-	estPose.x((estPose.x() - (m_ogmap.getSizeX()/2)) * m_ogmap.getResolution());
-	estPose.y((estPose.y() - (m_ogmap.getSizeY()/2)) * m_ogmap.getResolution());
+	estPose.x((estPose.x() - (m_map.getSizeX()/2)) * m_map.getResolution());
+	estPose.y((estPose.y() - (m_map.getSizeY()/2)) * m_map.getResolution());
 
   return estPose;
 }

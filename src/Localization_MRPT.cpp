@@ -38,7 +38,7 @@ static const char* localization_mrpt_spec[] =
  * @param manager Maneger Object
  */
 
-ssr::Pose2D CurrentPose, OldPose, deltaPose;
+ssr::Pose2D OldPose;
 ssr::MCLocalization_MRPT mcl;
 
 Localization_MRPT::Localization_MRPT(RTC::Manager* manager)
@@ -120,7 +120,11 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
   //initilize PF
   mcl.setMap(*ogmap);
   mcl.initialize();
-  
+
+  OldPose.x = 0;
+  OldPose.y = 0;
+  OldPose.th = 0;
+
   return RTC::RTC_OK;
 
 }
