@@ -33,7 +33,7 @@ void  MCLocalization_MRPT::initialize(){
 	pdf_.options.KLD_params.KLD_binSize_XY=0.20;
 	pdf_.options.KLD_params.KLD_delta = 0.02;
 	pdf_.options.KLD_params.KLD_epsilon =0.02;
-	pdf_.options.KLD_params.KLD_maxSampleSize = 40000;
+	pdf_.options.KLD_params.KLD_maxSampleSize =1000;
 	pdf_.options.KLD_params.KLD_minSampleSize = 150;
 	pdf_.options.KLD_params.KLD_minSamplesPerBin = 0;
 
@@ -53,10 +53,12 @@ void  MCLocalization_MRPT::initialize(){
     float max_x =  0.01;
     float min_y = -0.01;
     float max_y =  0.01;
-    float min_phi = 0;
-    float max_phi = 2*M_PI;
+    float min_phi = 0.05;
+    float max_phi = -0.05;
+	this->m_range_max = 10.0;
+	this->m_range_min = 0.3;
 	
-    pdf_.resetUniformFreeSpace(&m_map, 0.7f, 40000, min_x, max_x, min_y, max_y);
+    pdf_.resetUniformFreeSpace(&m_map, 0.7f, 1000, min_x, max_x, min_y, max_y);
 	
 }
 
@@ -64,13 +66,14 @@ bool MCLocalization_MRPT::addPose(const ssr::Pose2D& deltaPose)
 {
 	CActionRobotMovement2D action;
 	CActionRobotMovement2D::TMotionModelOptions options;
-	action.computeFromOdometry(CPose2D(deltaPose.x, deltaPose.y, deltaPose.th), options);
+	action.computeFromOdometry(CPose2D(deltaPose.x, deltaPose.y, deltaPose.th), motion_model_options_);
 	action.timestamp = mrpt::system::getCurrentTime();
 	static TTimeStamp oldTimestamp;
 	if(action.timestamp == oldTimestamp) {
 		action.timestamp = oldTimestamp +1;
 	}
 	oldTimestamp = action.timestamp;
+	m_ActionCollection.clear();
 	m_ActionCollection.insert(action);
 	return true;
 }
@@ -92,6 +95,7 @@ bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 		}
 	}
 	observation->setSensorPose(m_RangeSensorPose);
+	m_SensoryFrame.clear();
 	m_SensoryFrame.insert(observation);
 	return true;
 }

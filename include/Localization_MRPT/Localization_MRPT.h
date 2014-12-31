@@ -290,6 +290,8 @@ class Localization_MRPT
   
   // </rtc-template>
 
+
+	 bool m_odomUpdated, m_rangeUpdated;
 };
 
 

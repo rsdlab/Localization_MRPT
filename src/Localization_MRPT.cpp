@@ -113,8 +113,12 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
 {
   //Load OGMap
   OGMap* ogmap = new OGMap();
-  m_mapServer->requestCurrentBuiltMap(ogmap);
-  
+  while (m_mapServerPort.get_connector_profiles()->length() == 0) {
+	  coil::sleep(1);
+	  std::cout << "[RTC::Localization_MRPT] Waiting for Map Server Connection" << std::endl;
+  }
+  m_mapServer->requestCurrentBuiltMap(ogmap); 
+
   //initilize PF
   mcl.setMap(*ogmap);
   mcl.initialize();
@@ -123,6 +127,7 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
   OldPose.y = 0;
   OldPose.th = 0;
 
+  m_odomUpdated = m_rangeUpdated = false;
   return RTC::RTC_OK;
 
 }
@@ -140,12 +145,16 @@ RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
       ssr::Pose2D deltaPose = CurrentPose - OldPose;	  
 	  OldPose = CurrentPose;
 	  mcl.addPose(deltaPose);
+	  m_odomUpdated = true;
   }
   if(m_rangeIn.isNew()){
 	  m_rangeIn.read();
 	  ssr::Range range(&(m_range.ranges[0]), m_range.ranges.length(), m_range.config.maxAngle - m_range.config.minAngle);
 	  mcl.addRange(range);
+	  m_rangeUpdated = true;
   }
+
+  if(m_rangeUpdated && m_odomUpdated) {
     CPose2D estPose;
     estPose = mcl.getEstimatedPose();
    
@@ -154,6 +163,7 @@ RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
 	m_estimatedPose.data.heading = estPose.phi();
 	
 	m_estimatedPoseOut.write();
+  }
 
   return RTC::RTC_OK;
 }
