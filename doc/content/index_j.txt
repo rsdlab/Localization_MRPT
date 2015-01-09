@@ -98,7 +98,27 @@ Localization_MRPTは ``Localization_MRPTComp`` を実行（ ``${prefix}/componen
 ================ ================== ================ ====
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
-debug            int                0                
+min_x            float              -0.01            
+max_x            float              0.01             
+min_y            float              -0.01            
+max_y            float              0.01             
+min_phi          float              -0.01            
+max_phi          float              0.01             
+range_min        float              0.3              
+range_max        float              10               
+gausianModel_minStdXY float              0.01             
+gausianModel_minStdPHI float              0.01             
+KLD_binSize_PHI  float              0.01             
+KLD_binSize_XY   float              0.01             
+KLD_delta        float              0.02             
+KLD_epsilon      float              0.02             
+KLD_maxSampleSize int                1000             
+KLD_minSampleSize int                150              
+KLD_minSamplesPerBin double             0                
+adaptiveSampleSize bool               1                
+pfAuxFilterOptimal_MaximumSearchSamples int                10               
+BETA             double             0.5              
+sampleSize       int                1                
 ================ ================== ================ ====
 
 ポート

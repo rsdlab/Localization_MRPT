@@ -19,46 +19,36 @@ void  MCLocalization_MRPT::initialize(){
 	///
 	//pfOptions_.PF_algorithm = CParticleFilter::TParticleFilterAlgorithm.pfStandardProposal;
 	//pfOptions_.resamplingMethod = CParticleFilter::TParticleResamplingAlgorithm.prMultinomial;
-	pfOptions_.adaptiveSampleSize = 1;
-	pfOptions_.pfAuxFilterOptimal_MaximumSearchSamples = 10;
-	pfOptions_.BETA = 0.5;
-	pfOptions_.sampleSize = 1;
+	pfOptions_.adaptiveSampleSize = adaptiveSampleSize;
+	pfOptions_.pfAuxFilterOptimal_MaximumSearchSamples = pfAuxFilterOptimal_MaximumSearchSamples;
+	pfOptions_.BETA = BETA;
+	pfOptions_.sampleSize = sampleSize;
     pfOptions_.dumpToConsole();
  
     pf_.m_options = pfOptions_;
 	
 	///
 	pdf_.clear();
-	pdf_.options.KLD_params.KLD_binSize_PHI=20;
-	pdf_.options.KLD_params.KLD_binSize_XY=0.20;
-	pdf_.options.KLD_params.KLD_delta = 0.02;
-	pdf_.options.KLD_params.KLD_epsilon =0.02;
-	pdf_.options.KLD_params.KLD_maxSampleSize =1000;
-	pdf_.options.KLD_params.KLD_minSampleSize = 150;
-	pdf_.options.KLD_params.KLD_minSamplesPerBin = 0;
+	pdf_.options.KLD_params.KLD_binSize_PHI=KLD_binSize_PHI;
+	pdf_.options.KLD_params.KLD_binSize_XY=KLD_binSize_XY;
+	pdf_.options.KLD_params.KLD_delta = KLD_delta;
+	pdf_.options.KLD_params.KLD_epsilon =KLD_epsilon;
+	pdf_.options.KLD_params.KLD_maxSampleSize =KLD_maxSampleSize;
+	pdf_.options.KLD_params.KLD_minSampleSize = KLD_minSampleSize;
+	pdf_.options.KLD_params.KLD_minSamplesPerBin = KLD_minSamplesPerBin;
 
     pdf_.options.metricMap = &m_map;
 	
 	///
 	motion_model_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
-	motion_model_options_.gausianModel.minStdXY  = 0.10;
-	motion_model_options_.gausianModel.minStdPHI = 2.0;
+	motion_model_options_.gausianModel.minStdXY  = minStdXY;
+	motion_model_options_.gausianModel.minStdPHI = minStdPHI;
 	/*
 	motion_model_default_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
     motion_model_default_options_.gausianModel.minStdXY  = 0.10;
     motion_model_default_options_.gausianModel.minStdPHI = 2.0;
 	*/
-	
-	float min_x = -0.01;
-    float max_x =  0.01;
-    float min_y = -0.01;
-    float max_y =  0.01;
-    float min_phi = 0.05;
-    float max_phi = -0.05;
-	this->m_range_max = 10.0;
-	this->m_range_min = 0.3;
-	
-    pdf_.resetUniformFreeSpace(&m_map, 0.7f, 1000, min_x, max_x, min_y, max_y);
+	pdf_.resetUniformFreeSpace(&m_map, 0.7f, 1000, min_x, max_x, min_y, max_y,min_phi, max_phi);
 	
 }
 
@@ -88,7 +78,7 @@ bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 	observation->timestamp = mrpt::system::getCurrentTime();
 	for(int i = 0;i < range.size; i++) {
 		observation->scan[i] = range.range[i];
-		if(observation->scan[i] > m_range_min && observation->scan[i] < m_range_max) {
+		if(observation->scan[i] > range_min && observation->scan[i] < range_max) {
 			observation->validRange[i] = 1;
 		} else {
 			observation->validRange[i] = 0;
@@ -117,15 +107,20 @@ void MCLocalization_MRPT::OGMap2COccupancyGridMap(OGMap ogmap, COccupancyGridMap
 	
 			if(cell < 100){
 				gridmap->setCell(j, i, 0.0);
-			}
-			else if(cell > 200){
+			}else if(cell > 200){
 				gridmap->setCell(j, i, 1.0);
-			}
-			else{
-				gridmap->setCell(i, j, 0.5);
+			}else{
+				gridmap->setCell(j, i, 0.5);
 			}
 		}
 	}
+	/*
+	CImage		img;
+	gridmap->getAsImage(img,false, true);  
+	mrpt::gui::CDisplayWindow	win("Computed path");
+	win.showImage(img.scaleDouble().scaleDouble());
+	win.waitForKey();
+	//*/
 }
 
 void MCLocalization_MRPT::TimedPose2D2CPose2D(const TimedPose2D & tp, CPose2D & cp, const RTC::OGMap & map){

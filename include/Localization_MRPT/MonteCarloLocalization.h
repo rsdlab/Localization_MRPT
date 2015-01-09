@@ -251,9 +251,29 @@ namespace ssr{
 		mrpt::poses::CPose3D m_RangeSensorPose;
 		mrpt::poses::CPosePDFGaussian initialPose_;
 
-		//CPose2D estimatedPose;
-		float m_range_min;
-		float m_range_max;
+	public:
+		float min_x;
+		float max_x;
+		float min_y;
+		float max_y;
+		float min_phi;
+		float max_phi;
+		float range_min;
+		float range_max;
+				
+		float minStdXY;
+		float minStdPHI;
+		float KLD_binSize_PHI;
+		float KLD_binSize_XY;
+		float KLD_delta;
+		float KLD_epsilon;
+		int   KLD_maxSampleSize;
+		int   KLD_minSampleSize;
+		double KLD_minSamplesPerBin;
+		bool adaptiveSampleSize;
+		int pfAuxFilterOptimal_MaximumSearchSamples;
+ 		double BETA;
+		int sampleSize;
 
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -262,29 +282,52 @@ namespace ssr{
 		~MCLocalization_MRPT();
 
 		void setMap(const OGMap& map);
-
 		void initialize();
-
 		bool setRangeSensorPosition(const ssr::Position3D& position) {
 		m_RangeSensorPose = mrpt::poses::CPose3D(position.x, position.y, position.z, position.roll, position.pitch, position.yaw);
 		return true;
 		}
-
 		bool addPose(const ssr::Pose2D& pose);
-
 		bool addRange(const ssr::Range& range);
 		
 		void setRangeSensorRange(float min, float max) {
-			m_range_min = min;
-			m_range_max = max;
+			range_min = min;
+			range_max = max;
 		}
-		
 		CPose2D getEstimatedPose();
 
 	protected:
 		void configureFilter(const mrpt::utils::CConfigFile &_configFile);
 		void OGMap2COccupancyGridMap(RTC::OGMap ogmap, COccupancyGridMap2D *gridmap);
 		void TimedPose2D2CPose2D(const TimedPose2D & tp, CPose2D & cp, const RTC::OGMap & map);
+		/*void setParam(float min_x){
+			min_x;
+			max_x;
+			min_y;
+			max_y;
+			min_phi;
+			max_phi;
+			range_min;
+			range_max;
+			m_range_min;
+			m_range_max;
+
+							
+		    m_minStdXY;
+			m_minStdPHI;
+			m_KLD_binSize_PHI;
+			m_KLD_binSize_XY;
+			m_KLD_delta;
+			m_KLD_epsilon;
+			m_KLD_maxSampleSize;
+			m_KLD_minSampleSize;
+			m_KLD_minSamplesPerBin;
+			m_adaptiveSampleSize;
+			m_pfAuxFilterOptimal_MaximumSearchSamples;
+ 			m_BETA;
+			m_sampleSize;
+		}*/
+
 	};
 
 };

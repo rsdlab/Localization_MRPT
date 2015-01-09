@@ -26,9 +26,49 @@ static const char* localization_mrpt_spec[] =
     "language",          "C++",
     "lang_type",         "compile",
     // Configuration variables
-    "conf.default.debug", "0",
+    "conf.default.min_x", "-0.01",
+    "conf.default.max_x", "0.01",
+    "conf.default.min_y", "-0.01",
+    "conf.default.max_y", "0.01",
+    "conf.default.min_phi", "-0.01",
+    "conf.default.max_phi", "0.01",
+    "conf.default.range_min", "0.3",
+    "conf.default.range_max", "10",
+    "conf.default.gausianModel_minStdXY", "0.01",
+    "conf.default.gausianModel_minStdPHI", "0.01",
+    "conf.default.KLD_binSize_PHI", "0.01",
+    "conf.default.KLD_binSize_XY", "0.01",
+    "conf.default.KLD_delta", "0.02",
+    "conf.default.KLD_epsilon", "0.02",
+    "conf.default.KLD_maxSampleSize", "1000",
+    "conf.default.KLD_minSampleSize", "150",
+    "conf.default.KLD_minSamplesPerBin", "0",
+    "conf.default.adaptiveSampleSize", "1",
+    "conf.default.pfAuxFilterOptimal_MaximumSearchSamples", "10",
+    "conf.default.BETA", "0.5",
+    "conf.default.sampleSize", "1",
     // Widget
-    "conf.__widget__.debug", "text",
+    "conf.__widget__.min_x", "text",
+    "conf.__widget__.max_x", "text",
+    "conf.__widget__.min_y", "text",
+    "conf.__widget__.max_y", "text",
+    "conf.__widget__.min_phi", "text",
+    "conf.__widget__.max_phi", "text",
+    "conf.__widget__.range_min", "text",
+    "conf.__widget__.range_max", "text",
+    "conf.__widget__.gausianModel_minStdXY", "text",
+    "conf.__widget__.gausianModel_minStdPHI", "text",
+    "conf.__widget__.KLD_binSize_PHI", "text",
+    "conf.__widget__.KLD_binSize_XY", "text",
+    "conf.__widget__.KLD_delta", "text",
+    "conf.__widget__.KLD_epsilon", "text",
+    "conf.__widget__.KLD_maxSampleSize", "text",
+    "conf.__widget__.KLD_minSampleSize", "text",
+    "conf.__widget__.KLD_minSamplesPerBin", "text",
+    "conf.__widget__.adaptiveSampleSize", "text",
+    "conf.__widget__.pfAuxFilterOptimal_MaximumSearchSamples", "text",
+    "conf.__widget__.BETA", "text",
+    "conf.__widget__.sampleSize", "text",
     // Constraints
     ""
   };
@@ -82,7 +122,27 @@ RTC::ReturnCode_t Localization_MRPT::onInitialize()
 
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
-  bindParameter("debug", m_debug, "0");
+  bindParameter("min_x", m_min_x, "-0.01");
+  bindParameter("max_x", m_max_x, "0.01");
+  bindParameter("min_y", m_min_y, "-0.01");
+  bindParameter("max_y", m_max_y, "0.01");
+  bindParameter("min_phi", m_min_phi, "-0.01");
+  bindParameter("max_phi", m_max_phi, "0.01");
+  bindParameter("range_min", m_range_min, "0.3");
+  bindParameter("range_max", m_range_max, "10");
+  bindParameter("gausianModel_minStdXY", m_minStdXY, "0.01");
+  bindParameter("gausianModel_minStdPHI", m_minStdPHI, "0.01");
+  bindParameter("KLD_binSize_PHI", m_KLD_binSize_PHI, "0.01");
+  bindParameter("KLD_binSize_XY", m_KLD_binSize_XY, "0.01");
+  bindParameter("KLD_delta", m_KLD_delta, "0.02");
+  bindParameter("KLD_epsilon", m_KLD_epsilon, "0.02");
+  bindParameter("KLD_maxSampleSize", m_KLD_maxSampleSize, "1000");
+  bindParameter("KLD_minSampleSize", m_KLD_minSampleSize, "150");
+  bindParameter("KLD_minSamplesPerBin", m_KLD_minSamplesPerBin, "0");
+  bindParameter("adaptiveSampleSize", m_adaptiveSampleSize, "1");
+  bindParameter("pfAuxFilterOptimal_MaximumSearchSamples", m_pfAuxFilterOptimal_MaximumSearchSamples, "10");
+  bindParameter("BETA", m_BETA, "0.5");
+  bindParameter("sampleSize", m_sampleSize, "1");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -121,6 +181,29 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
 
   //initilize PF
   mcl.setMap(*ogmap);
+  mcl.min_x = m_min_x;
+  mcl.max_x = m_max_x;
+  mcl.min_y = m_min_y;
+  mcl.max_y = m_max_y;
+  mcl.min_phi = m_min_phi;
+  mcl.max_phi = m_max_phi;
+  mcl.range_min = m_range_min;
+  mcl.range_max = m_range_max;
+
+  mcl.minStdXY = m_minStdXY;
+  mcl.minStdPHI = m_minStdPHI;
+  mcl.KLD_binSize_PHI = m_KLD_binSize_PHI;
+  mcl.KLD_binSize_XY = m_KLD_binSize_XY;
+  mcl.KLD_delta = m_KLD_delta;
+  mcl.KLD_epsilon = m_KLD_epsilon;
+  mcl.KLD_maxSampleSize = m_KLD_maxSampleSize;
+  mcl.KLD_minSampleSize = m_KLD_minSampleSize;
+  mcl.KLD_minSamplesPerBin = m_KLD_minSamplesPerBin;
+  mcl.adaptiveSampleSize = m_adaptiveSampleSize;
+  mcl.pfAuxFilterOptimal_MaximumSearchSamples = m_pfAuxFilterOptimal_MaximumSearchSamples;
+  mcl.BETA = m_BETA;
+  mcl.sampleSize = m_sampleSize;
+
   mcl.initialize();
 
   OldPose.x = 0;
@@ -160,7 +243,7 @@ RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
    
 	m_estimatedPose.data.position.x = estPose.x();
 	m_estimatedPose.data.position.y = estPose.y();
-	m_estimatedPose.data.heading = estPose.phi();
+	m_estimatedPose.data.heading    = estPose.phi();
 	
 	m_estimatedPoseOut.write();
   }

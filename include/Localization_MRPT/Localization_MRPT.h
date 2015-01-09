@@ -230,10 +230,130 @@ class Localization_MRPT
   // <rtc-template block="config_declare">
   /*!
    * 
-   * - Name:  debug
+   * - Name:  min_x
+   * - DefaultValue: -0.01
+   */
+  float m_min_x;
+  /*!
+   * 
+   * - Name:  max_x
+   * - DefaultValue: 0.01
+   */
+  float m_max_x;
+  /*!
+   * 
+   * - Name:  min_y
+   * - DefaultValue: -0.01
+   */
+  float m_min_y;
+  /*!
+   * 
+   * - Name:  max_y
+   * - DefaultValue: 0.01
+   */
+  float m_max_y;
+  /*!
+   * 
+   * - Name:  min_phi
+   * - DefaultValue: -0.01
+   */
+  float m_min_phi;
+  /*!
+   * 
+   * - Name:  max_phi
+   * - DefaultValue: 0.01
+   */
+  float m_max_phi;
+  /*!
+   * 
+   * - Name:  range_min
+   * - DefaultValue: 0.3
+   */
+  float m_range_min;
+  /*!
+   * 
+   * - Name:  range_max
+   * - DefaultValue: 10
+   */
+  float m_range_max;
+  /*!
+   * 
+   * - Name:  minStdXY
+   * - DefaultValue: 0.01
+   */
+  float m_minStdXY;
+  /*!
+   * 
+   * - Name:  minStdPHI
+   * - DefaultValue: 0.01
+   */
+  float m_minStdPHI;
+  /*!
+   * 
+   * - Name:  KLD_binSize_PHI
+   * - DefaultValue: 0.01
+   */
+  float m_KLD_binSize_PHI;
+  /*!
+   * 
+   * - Name:  KLD_binSize_XY
+   * - DefaultValue: 0.01
+   */
+  float m_KLD_binSize_XY;
+  /*!
+   * 
+   * - Name:  KLD_delta
+   * - DefaultValue: 0.02
+   */
+  float m_KLD_delta;
+  /*!
+   * 
+   * - Name:  KLD_epsilon
+   * - DefaultValue: 0.02
+   */
+  float m_KLD_epsilon;
+  /*!
+   * 
+   * - Name:  KLD_maxSampleSize
+   * - DefaultValue: 1000
+   */
+  int m_KLD_maxSampleSize;
+  /*!
+   * 
+   * - Name:  KLD_minSampleSize
+   * - DefaultValue: 150
+   */
+  int m_KLD_minSampleSize;
+  /*!
+   * 
+   * - Name:  KLD_minSamplesPerBin
    * - DefaultValue: 0
    */
-  int m_debug;
+  double m_KLD_minSamplesPerBin;
+  /*!
+   * 
+   * - Name:  adaptiveSampleSize
+   * - DefaultValue: 1
+   */
+  bool m_adaptiveSampleSize;
+  /*!
+   * 
+   * - Name:  pfAuxFilterOptimal_MaximumSearchSamples
+   * - DefaultValue: 10
+   */
+  int m_pfAuxFilterOptimal_MaximumSearchSamples;
+  /*!
+   * 
+   * - Name:  BETA
+   * - DefaultValue: 0.5
+   */
+  double m_BETA;
+  /*!
+   * 
+   * - Name:  sampleSize
+   * - DefaultValue: 1
+   */
+  int m_sampleSize;
 
   // </rtc-template>
 
