@@ -354,6 +354,12 @@ class Localization_MRPT
    * - DefaultValue: 1
    */
   int m_sampleSize;
+  /*!
+   * 
+   * - Name:  poseTimeOut
+   * - DefaultValue: 3.0
+   */
+  float m_poseTimeOut;
 
   // </rtc-template>
 
@@ -412,6 +418,17 @@ class Localization_MRPT
 
 
 	 bool m_odomUpdated, m_rangeUpdated;
+
+	 
+	 coil::TimeValue m_lastReceivedTime;
+
+	 enum LOCALIZATION_MODE{
+		 MODE_NORMAL,
+		 MODE_POSE_INVALID_VALUE,
+		 MODE_POSE_TIME_OUT
+	 };
+	 LOCALIZATION_MODE m_MODE;
+	 LOCALIZATION_MODE getMode(){return m_MODE;}
 };
 
 

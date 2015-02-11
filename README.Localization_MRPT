@@ -325,6 +325,14 @@ Lang Type:
 		Range:           
 		Constraint:      
 
+		Name:             poseTimeOut
+		Description:     
+		Type:            float
+		DefaultValue:     3.0
+		Unit:            
+		Range:           
+		Constraint:      
+
 # </rtc-template> 
 
 This software is developed at the National Institute of Advanced

@@ -47,6 +47,7 @@ static const char* localization_mrpt_spec[] =
     "conf.default.pfAuxFilterOptimal_MaximumSearchSamples", "10",
     "conf.default.BETA", "0.5",
     "conf.default.sampleSize", "1",
+    "conf.default.poseTimeOut", "3.0",
     // Widget
     "conf.__widget__.min_x", "text",
     "conf.__widget__.max_x", "text",
@@ -69,6 +70,7 @@ static const char* localization_mrpt_spec[] =
     "conf.__widget__.pfAuxFilterOptimal_MaximumSearchSamples", "text",
     "conf.__widget__.BETA", "text",
     "conf.__widget__.sampleSize", "text",
+    "conf.__widget__.poseTimeOut", "text",
     // Constraints
     ""
   };
@@ -143,6 +145,7 @@ RTC::ReturnCode_t Localization_MRPT::onInitialize()
   bindParameter("pfAuxFilterOptimal_MaximumSearchSamples", m_pfAuxFilterOptimal_MaximumSearchSamples, "10");
   bindParameter("BETA", m_BETA, "0.5");
   bindParameter("sampleSize", m_sampleSize, "1");
+  bindParameter("poseTimeOut", m_poseTimeOut, "3.0");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -171,6 +174,9 @@ RTC::ReturnCode_t Localization_MRPT::onShutdown(RTC::UniqueId ec_id)
       
 RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
 {
+  m_MODE = MODE_NORMAL;  
+  m_lastReceivedTime = coil::gettimeofday();
+
   //Load OGMap
   OGMap* ogmap = new OGMap();
   while (m_mapServerPort.get_connector_profiles()->length() == 0) {
@@ -222,14 +228,32 @@ RTC::ReturnCode_t Localization_MRPT::onDeactivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
 {
+  coil::TimeValue currentTime = coil::gettimeofday();
+
   if(m_odometryIn.isNew()){
 	  m_odometryIn.read();
 	  ssr::Pose2D CurrentPose(m_odometry.data.position.x, m_odometry.data.position.y, m_odometry.data.heading);
-      ssr::Pose2D deltaPose = CurrentPose - OldPose;	  
+      ssr::Pose2D deltaPose = CurrentPose - OldPose;
+	  if(deltaPose.x < -5 || deltaPose.x >5){// the number should be add configuration
+		m_MODE = MODE_POSE_INVALID_VALUE;
+		m_estimatedPoseOut.disconnect("estimatedPose");
+	  }else if(deltaPose.y < -5 || deltaPose.y >5){
+		m_MODE = MODE_POSE_INVALID_VALUE;
+		m_estimatedPoseOut.disconnect("estimatedPose");
+	  }
 	  OldPose = CurrentPose;
 	  mcl.addPose(deltaPose);
 	  m_odomUpdated = true;
+	  	  
+      m_lastReceivedTime = currentTime;
+  }else {
+    double duration = currentTime - m_lastReceivedTime;
+    if (duration > m_poseTimeOut && m_poseTimeOut > 0) {
+      m_MODE = MODE_POSE_TIME_OUT;
+	  m_estimatedPoseOut.disconnect("estimatedPose");
+    }
   }
+
   if(m_rangeIn.isNew()){
 	  m_rangeIn.read();
 	  ssr::Range range(&(m_range.ranges[0]), m_range.ranges.length(), m_range.config.maxAngle - m_range.config.minAngle);

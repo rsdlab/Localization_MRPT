@@ -119,6 +119,7 @@ adaptiveSampleSize bool               1
 pfAuxFilterOptimal_MaximumSearchSamples int                10               
 BETA             double             0.5              
 sampleSize       int                1                
+poseTimeOut      float              3.0              
 ================ ================== ================ ====
 
 ポート
