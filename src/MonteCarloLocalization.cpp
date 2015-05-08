@@ -107,13 +107,19 @@ CPose2D MCLocalization_MRPT::getEstimatedPose(){
 }
 
 void MCLocalization_MRPT::OGMap2COccupancyGridMap(OGMap ogmap, COccupancyGridMap2D *gridmap) {
-	gridmap->setSize(0-ogmap.map.width*ogmap.config.xScale/2, ogmap.map.width*ogmap.config.xScale/2, 0-ogmap.map.width*ogmap.config.yScale/2, ogmap.map.height*ogmap.config.yScale/2, ogmap.config.xScale);
+	gridmap->setSize(
+		-ogmap.config.origin.position.x,
+		ogmap.map.width * ogmap.config.xScale - ogmap.config.origin.position.x,
+		-(ogmap.map.height * ogmap.config.yScale + ogmap.config.origin.position.y),
+		-ogmap.config.origin.position.y,
+		ogmap.config.xScale);
+	//gridmap->setSize(0-ogmap.map.width*ogmap.config.xScale/2, ogmap.map.width*ogmap.config.xScale/2, 0-ogmap.map.width*ogmap.config.yScale/2, ogmap.map.height*ogmap.config.yScale/2, ogmap.config.xScale);
 	int height = gridmap->getSizeY();
 	int width =  gridmap->getSizeX();
 
 	for(int i=0; i <height ; i++){
 		for(int j=0; j <width ; j++){
-			int cell = ogmap.map.cells[i * width + j];
+			int cell = ogmap.map.cells[(height-i-1) * width + j];
 	
 			if(cell < 100){
 				gridmap->setCell(j, i, 0.0);
@@ -122,7 +128,7 @@ void MCLocalization_MRPT::OGMap2COccupancyGridMap(OGMap ogmap, COccupancyGridMap
 				gridmap->setCell(j, i, 1.0);
 			}
 			else{
-				gridmap->setCell(i, j, 0.5);
+				gridmap->setCell(j, i, 1.0);
 			}
 		}
 	}
