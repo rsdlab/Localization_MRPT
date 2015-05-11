@@ -117,9 +117,28 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
 	  coil::sleep(1);
 	  std::cout << "[RTC::Localization_MRPT] Waiting for Map Server Connection" << std::endl;
   }
-  m_mapServer->requestCurrentBuiltMap(ogmap); 
 
-  //initilize PF
+  RTC::ConnectorProfileList& pList = *(m_mapServerPort.get_connector_profiles());
+  RTC::RTObjectRef rto = (RTObjectRef)pList[0].ports[0]->get_port_profile()->owner;
+  if(std::string((const char*)rto->get_component_profile()->instance_name) == this->getInstanceName()) {
+    rto = (RTObjectRef)pList[0].ports[1]->get_port_profile()->owner;
+  }
+  do {
+	  coil::sleep(1);
+	  std::cout << "[RTC::Localization_MRPT] Waiting for Map Server Activation" << std::endl;
+	  if((*(rto->get_owned_contexts()))[0]->get_component_state(rto) == RTC::LifeCycleState::ERROR_STATE) {
+		  std::cout << "[RTC::Localization_MRPT] Map Server RTC is now in ERROR_STATE" << std::endl;
+		  return RTC::RTC_ERROR;
+	  }
+  } while ((*(rto->get_owned_contexts()))[0]->get_component_state(rto) != RTC::LifeCycleState::ACTIVE_STATE);
+
+  RTC::RETURN_VALUE ret = m_mapServer->requestCurrentBuiltMap(ogmap); 
+
+  if (ret != RETURN_VALUE::RETVAL_OK) {
+	  std::cout << "[RTC::Localization_MRPT] Acquiring Map from Server Failed." << std::endl;
+  }
+
+  std::cout << "[RTC::Localization_MRPT] Initializing Monte Carlo Localization." << std::endl;
   mcl.setMap(*ogmap);
   mcl.initialize();
 
@@ -128,6 +147,7 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
   OldPose.th = 0;
 
   m_odomUpdated = m_rangeUpdated = false;
+  std::cout << "[RTC::Localization_MRPT] Successfully Activated." << std::endl;
   return RTC::RTC_OK;
 
 }
