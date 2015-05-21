@@ -251,29 +251,29 @@ namespace ssr{
 		mrpt::poses::CPose3D m_RangeSensorPose;
 		mrpt::poses::CPosePDFGaussian initialPose_;
 
-	public:
-		float min_x;
-		float max_x;
-		float min_y;
-		float max_y;
-		float min_phi;
-		float max_phi;
-		float range_min;
-		float range_max;
+		//CPose2D estimatedPose;
+		float m_range_min;
+		float m_range_max;
+		float m_min_x;
+		float m_max_x;
+		float m_min_y;
+		float m_max_y;
+		float m_min_phi;
+		float m_max_phi;
 				
-		float minStdXY;
-		float minStdPHI;
-		float KLD_binSize_PHI;
-		float KLD_binSize_XY;
-		float KLD_delta;
-		float KLD_epsilon;
-		int   KLD_maxSampleSize;
-		int   KLD_minSampleSize;
-		double KLD_minSamplesPerBin;
-		bool adaptiveSampleSize;
-		int pfAuxFilterOptimal_MaximumSearchSamples;
- 		double BETA;
-		int sampleSize;
+		float m_minStdXY;
+		float m_minStdPHI;
+		double m_KLD_binSize_PHI;
+		double m_KLD_binSize_XY;
+		double m_KLD_delta;
+		double m_KLD_epsilon;
+		int   m_KLD_maxSampleSize;
+		int   m_KLD_minSampleSize;
+		double m_KLD_minSamplesPerBin;
+		bool m_adaptiveSampleSize;
+		int m_pfAuxFilterOptimal_MaximumSearchSamples;
+ 		double m_BETA;
+		int m_sampleSize;
 
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -291,8 +291,8 @@ namespace ssr{
 		bool addRange(const ssr::Range& range);
 		
 		void setRangeSensorRange(float min, float max) {
-			range_min = min;
-			range_max = max;
+			m_range_min = min;
+			m_range_max = max;
 		}
 		CPose2D getEstimatedPose();
 
