@@ -21,6 +21,7 @@
 
 using namespace RTC;
 using namespace std;
+	
 
 
 // Service implementation headers
@@ -370,11 +371,12 @@ class Localization_MRPT
   //	3: prSystematic
   */
   int m_resamplingMethod;
-  std::string m_map_file;	
-  std::string m_rawlog_file;
-  std::string m_logOutput_dir;
-  int m_3DSceneFrequency;
+  //std::string m_map_file;	
+  //std::string m_rawlog_file;
+  //std::string m_logOutput_dir;
+  //int m_3DSceneFrequency;
   int m_particles_count;
+  /*
   int m_init_PDF_mode;
   int m_init_PDF_min_x;
   int m_init_PDF_max_x;
@@ -418,7 +420,7 @@ class Localization_MRPT
   double m_rayTracing_stdHit;
   int m_consensus_takeEachRange;
   int m_consensus_pow;
-	
+	*/
 
 
   /*!

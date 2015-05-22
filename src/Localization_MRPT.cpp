@@ -46,13 +46,15 @@ static const char* localization_mrpt_spec[] =
     "conf.default.adaptiveSampleSize", "1",
     "conf.default.pfAuxFilterOptimal_MaximumSearchSamples", "10",
     "conf.default.BETA", "0.5",
+	"conf.default.sampleSize", "1",
     "conf.default.PF_algorithm", "0",
-    "conf.default.resamplingMethod", "0",
-    "conf.default.map_file", "",	
-    "conf.default.rawlog_file", "",
-    "conf.default.logOutput_dir", "LOG_LOCALIZATION",
-    "conf.default.3DSceneFrequency", "1",
+    "conf.default.resamplingMethod", "prMultinomials",//
+    //"conf.default.map_file", "",	
+    //"conf.default.rawlog_file", "",
+    //"conf.default.logOutput_dir", "LOG_LOCALIZATION",
+    //"conf.default.3DSceneFrequency", "1",
     "conf.default.particles_count", "1000",
+	/*
     "conf.default.init_PDF_mode", "0",
     "conf.default.init_PDF_min_x", "-1",
     "conf.default.init_PDF_max_x", "1",
@@ -62,30 +64,24 @@ static const char* localization_mrpt_spec[] =
     "conf.default.init_PDF_max_phi_deg", "45",	
     "conf.default.SHOW_PROGRESS_3D_REAL_TIME", "true",
 
-// Creation of maps:
     "conf.default.occupancyGrid_count","1",
     "conf.default.gasGrid_count","0",
     "conf.default.landmarksMap_count","0",
     "conf.default.pointsMap_count","0",
     "conf.default.beaconMap_count","0",
-// Selection of map for likelihood: (fuseAll=-1,occGrid=0, points=1,landmarks=2,gasGrid=3)
     "conf.default.likelihoodMapSelection","-1",
-// Enables (1) / Disables (0) insertion into specific maps:
     "conf.default.enableInsertion_pointsMap","1",
     "conf.default.enableInsertion_landmarksMap","1",
     "conf.default.enableInsertion_gridMaps","1",
     "conf.default.enableInsertion_gasGridMaps","1",
     "conf.default.enableInsertion_beaconMap","1",
-// Creation Options for OccupancyGridMap 00:
     "conf.default.resolution","0.06",
-// Insertion Options for OccupancyGridMap 00:
     "conf.default.mapAltitude","0",
     "conf.default.useMapAltitude","0",
     "conf.default.maxDistanceInsertion","15",
     "conf.default.maxOccupancyUpdateCertainty","0.55",
     "conf.default.considerInvalidRangesAsFreeSpace","1",
     "conf.default.minLaserScanNoiseStd","0.001",
-// Likelihood Options for OccupancyGridMap 00:
     "conf.default.likelihoodMethod","4",		// 0=MI, 1=Beam Model, 2=RSLC, 3=Cells Difs, 4=LF_Trun, 5=LF_II
     "conf.default.LF_decimation","20",
     "conf.default.LF_stdHit","0.20",
@@ -102,7 +98,7 @@ static const char* localization_mrpt_spec[] =
     "conf.default.rayTracing_stdHit","0.30",
     "conf.default.consensus_takeEachRange","30",
     "conf.default.consensus_pow","1",
-	
+	*/
     "conf.default.poseTimeOut", "3.0",
     // Widget
     "conf.__widget__.min_x", "text",
@@ -126,13 +122,14 @@ static const char* localization_mrpt_spec[] =
     "conf.__widget__.pfAuxFilterOptimal_MaximumSearchSamples", "text",
     "conf.__widget__.BETA", "text",
     "conf.__widget__.sampleSize", "text",
-	"conf.__widget__.PF_algorithm", "text",
-    "conf.__widget__.resamplingMethod", "text",
-    "conf.__widget__.map_file", "text",	
-    "conf.__widget__.rawlog_file", "text",
-    "conf.__widget__.logOutput_dir", "text",
-    "conf.__widget__.3DSceneFrequency", "text",
+	"conf.__widget__.PF_algorithm", "radio",
+    "conf.__widget__.resamplingMethod", "radio",
+    //"conf.__widget__.map_file", "text",	
+    //"conf.__widget__.rawlog_file", "text",
+    //"conf.__widget__.logOutput_dir", "text",
+    //"conf.__widget__.3DSceneFrequency", "text",
     "conf.__widget__.particles_count", "text",
+	/*
     "conf.__widget__.init_PDF_mode", "text",
     "conf.__widget__.init_PDF_min_x", "text",
     "conf.__widget__.init_PDF_max_x", "text",
@@ -140,6 +137,7 @@ static const char* localization_mrpt_spec[] =
     "conf.__widget__.init_PDF_max_y", "text",
     "conf.__widget__.init_PDF_min_phi_deg", "text",
     "conf.__widget__.init_PDF_max_phi_deg", "text",	
+	
     "conf.__widget__.SHOW_PROGRESS_3D_REAL_TIME", "text",
 
     "conf.__widget__.occupancyGrid_count","text",
@@ -176,9 +174,11 @@ static const char* localization_mrpt_spec[] =
     "conf.__widget__.rayTracing_stdHit","text",
     "conf.__widget__.consensus_takeEachRange","text",
     "conf.__widget__.consensus_pow","text",
-
+	*/
     "conf.__widget__.poseTimeOut", "text",
     // Constraints
+	 "conf.__constraints__.PF_algorithm", "(pfStandardProposal,  pfAuxiliaryPFStandard, pfOptimalProposal, pfAuxiliaryPFOptimal)",
+     "conf.__constraints__.resamplingMethod", "(prMultinomials, prResidual, prStratified, prSystematic)",
     ""
   };
 // </rtc-template>
@@ -235,14 +235,14 @@ RTC::ReturnCode_t Localization_MRPT::onInitialize()
   bindParameter("max_x", m_max_x, "0.01");
   bindParameter("min_y", m_min_y, "-0.01");
   bindParameter("max_y", m_max_y, "0.01");
-  bindParameter("min_phi", m_min_phi, "0.05");
-  bindParameter("max_phi", m_max_phi, "-0.05");
+  bindParameter("min_phi", m_min_phi, "-0.01");
+  bindParameter("max_phi", m_max_phi, "0.01");
   bindParameter("range_min", m_range_min, "0.3");
   bindParameter("range_max", m_range_max, "10");
   bindParameter("gausianModel_minStdXY", m_minStdXY, "0.01");
-  bindParameter("gausianModel_minStdPHI", m_minStdPHI, "2.0");
-  bindParameter("KLD_binSize_PHI", m_KLD_binSize_PHI, "20");
-  bindParameter("KLD_binSize_XY", m_KLD_binSize_XY, "0.2");
+  bindParameter("gausianModel_minStdPHI", m_minStdPHI, "0.01");
+  bindParameter("KLD_binSize_PHI", m_KLD_binSize_PHI, "0.01");
+  bindParameter("KLD_binSize_XY", m_KLD_binSize_XY, "0.01");
   bindParameter("KLD_delta", m_KLD_delta, "0.02");
   bindParameter("KLD_epsilon", m_KLD_epsilon, "0.02");
   bindParameter("KLD_maxSampleSize", m_KLD_maxSampleSize, "1000");
@@ -254,11 +254,12 @@ RTC::ReturnCode_t Localization_MRPT::onInitialize()
   bindParameter("sampleSize", m_sampleSize, "1");
   bindParameter("PF_algorithm", m_PF_algorithm,"0");
   bindParameter("resamplingMethod",m_resamplingMethod, "0");
-  bindParameter("map_file",m_map_file, "");	
-  bindParameter("rawlog_file",m_rawlog_file, "");
-  bindParameter("logOutput_dir", m_logOutput_dir,"LOG_LOCALIZATION");
-  bindParameter("3DSceneFrequency",m_3DSceneFrequency, "1");
+  //bindParameter("map_file",m_map_file, "");	
+  //bindParameter("rawlog_file",m_rawlog_file, "");
+  //bindParameter("logOutput_dir", m_logOutput_dir,"LOG_LOCALIZATION");
+  //bindParameter("3DSceneFrequency",m_3DSceneFrequency, "1");
   bindParameter("particles_count", m_particles_count,"1000");
+  /*
   bindParameter("init_PDF_mode",m_init_PDF_mode ,"0");
   bindParameter("init_PDF_min_x",m_init_PDF_min_x ,"-1");
   bindParameter("init_PDF_max_x",m_init_PDF_max_x, "1");
@@ -302,7 +303,7 @@ RTC::ReturnCode_t Localization_MRPT::onInitialize()
   bindParameter("rayTracing_stdHit", m_rayTracing_stdHit, "0.30");
   bindParameter("consensus_takeEachRange", m_consensus_takeEachRange, "30");
   bindParameter("consensus_pow", m_consensus_pow, "1");
-	
+*/
 
   bindParameter("poseTimeOut", m_poseTimeOut, "3.0");
   // </rtc-template>
@@ -364,8 +365,11 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
   }
 
   std::cout << "[RTC::Localization_MRPT] Initializing Monte Carlo Localization." << std::endl;
+
   mcl.setMap(*ogmap);
   
+  mcl.m_PF_algorithm = mrpt::bayes::CParticleFilter::TParticleFilterAlgorithm(m_PF_algorithm);
+  mcl.m_resamplingMethod =  mrpt::bayes::CParticleFilter::TParticleResamplingAlgorithm(m_resamplingMethod);
   mcl.m_min_x = m_min_x;
   mcl.m_max_x = m_max_x;
   mcl.m_min_y = m_min_y;
@@ -374,6 +378,7 @@ RTC::ReturnCode_t Localization_MRPT::onActivated(RTC::UniqueId ec_id)
   mcl.m_max_phi = m_max_phi;
   mcl.m_range_min = m_range_min;
   mcl.m_range_max = m_range_max;
+  mcl.m_particles_count = m_particles_count;
 
   mcl.m_minStdXY = m_minStdXY;
   mcl.m_minStdPHI = m_minStdPHI;

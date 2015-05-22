@@ -16,9 +16,8 @@ void  MCLocalization_MRPT::setMap(const OGMap& map){
 }
 
 void  MCLocalization_MRPT::initialize(){
-	///
-	//pfOptions_.PF_algorithm = CParticleFilter::TParticleFilterAlgorithm.pfStandardProposal;
-	//pfOptions_.resamplingMethod = CParticleFilter::TParticleResamplingAlgorithm.prMultinomial;
+	pfOptions_.PF_algorithm = m_PF_algorithm;
+	pfOptions_.resamplingMethod = m_resamplingMethod;
 	pfOptions_.adaptiveSampleSize = m_adaptiveSampleSize;
 	pfOptions_.pfAuxFilterOptimal_MaximumSearchSamples = m_pfAuxFilterOptimal_MaximumSearchSamples;
 	pfOptions_.BETA = m_BETA;
@@ -37,19 +36,13 @@ void  MCLocalization_MRPT::initialize(){
 	pdf_.options.KLD_params.KLD_minSampleSize =		m_KLD_minSampleSize;
 	pdf_.options.KLD_params.KLD_minSamplesPerBin =	m_KLD_minSamplesPerBin;
 
-    pdf_.options.metricMap = &m_map;
-	
+	pdf_.options.metricMap = &m_map;
 	///
 	motion_model_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
 	motion_model_options_.gausianModel.minStdXY  = m_minStdXY;
 	motion_model_options_.gausianModel.minStdPHI = m_minStdPHI;
-	/*
-	motion_model_default_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
-    motion_model_default_options_.gausianModel.minStdXY  = 0.10;
-    motion_model_default_options_.gausianModel.minStdPHI = 2.0;
-	*/
 
-	pdf_.resetUniformFreeSpace(&m_map, 0.7f, 1000, m_min_x, m_max_x, m_min_y, m_max_y); //,m_min_phi, m_max_phi);
+	pdf_.resetUniformFreeSpace(&m_map, 0.7f, m_particles_count, m_min_x, m_max_x, m_min_y, m_max_y);//, m_min_phi, m_max_phi);
 }
 
 bool MCLocalization_MRPT::addPose(const ssr::Pose2D& deltaPose)
@@ -92,7 +85,6 @@ bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 
 CPose2D MCLocalization_MRPT::getEstimatedPose(){
     pf_.executeOn(pdf_,& m_ActionCollection,& m_SensoryFrame, &pf_stats_);
-  
 	return pdf_.getMeanVal();
 }
 
