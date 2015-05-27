@@ -274,73 +274,57 @@ namespace ssr{
  		double m_BETA;
 		int m_sampleSize;
 
-		  /*!
-		  // The Particle Filter algorithm:
-		  //	0: pfStandardProposal	  ***
-		  //	1: pfAuxiliaryPFStandard
-		  //	2: pfOptimalProposal    
-		  //	3: pfAuxiliaryPFOptimal	  ***
-		  */
-		  mrpt::bayes::CParticleFilter::TParticleFilterAlgorithm m_PF_algorithm;
-		  /*!
-		  // The Particle Filter Resampling method:
-		  //	0: prMultinomial
-		  //	1: prResidual
-		  //	2: prStratified
-		  //	3: prSystematic
-		  */
-		  mrpt::bayes::CParticleFilter::TParticleResamplingAlgorithm m_resamplingMethod;
-		  //std::string m_map_file;	
-		  //std::string m_rawlog_file;
-		  //std::string m_logOutput_dir;
-		  //int m_3DSceneFrequency;
-		  int m_particles_count;
-		  /*
-		  int m_init_PDF_mode;
-		  int m_init_PDF_min_x;
-		  int m_init_PDF_max_x;
-		  int m_init_PDF_min_y;
-		  int m_init_PDF_max_y;
-		  int m_init_PDF_min_phi_deg;
-		  int m_init_PDF_max_phi_deg;
-		  bool m_SHOW_PROGRESS_3D_REAL_TIME;
+		/*!
+		// The Particle Filter algorithm:
+		//	0: pfStandardProposal	  ***
+		//	1: pfAuxiliaryPFStandard
+		//	2: pfOptimalProposal    
+		//	3: pfAuxiliaryPFOptimal	  ***
+		*/
+		mrpt::bayes::CParticleFilter::TParticleFilterAlgorithm m_PF_algorithm;
+		/*!
+		// The Particle Filter Resampling method:
+		//	0: prMultinomial
+		//	1: prResidual
+		//	2: prStratified
+		//	3: prSystematic
+		*/
+		mrpt::bayes::CParticleFilter::TParticleResamplingAlgorithm m_resamplingMethod;
+		//std::string m_rawlog_file;
+		//std::string m_logOutput_dir;
+		int m_particles_count;
 
-		  int m_occupancyGrid_count;
-		  int m_gasGrid_count;
-		  int m_landmarksMap_count;
-		  int m_pointsMap_count;
-		  int m_beaconMap_count;
-		  int m_likelihoodMapSelection;
-		  int m_enableInsertion_pointsMap;
-		  int m_enableInsertion_landmarksMap;
-		  int m_enableInsertion_gridMaps;
-		  int m_enableInsertion_gasGridMaps;
-		  int m_enableInsertion_beaconMap;
-		  double m_resolution;
-		  int m_mapAltitude;
-		  int m_useMapAltitude;
-		  int m_maxDistanceInsertion;
-		  double m_maxOccupancyUpdateCertainty;
-		  int m_considerInvalidRangesAsFreeSpace;
-		  double m_minLaserScanNoiseStd;
-		  int m_likelihoodMethod;
-		  int m_LF_decimation;
-		  double m_LF_stdHit;
-		  double m_LF_maxCorrsDistance;
-		  double m_LF_zHit;
-		  double m_LF_zRandom;
-		  double m_LF_maxRange;
-		  int m_LF_alternateAverageMethod;
-		  int m_MI_exponent;
-		  int m_MI_skip_rays;
-		  int m_MI_ratio_max_distance;				
-		  int m_rayTracing_useDistanceFilter;
-		  int m_rayTracing_decimation;
-		  double m_rayTracing_stdHit;
-		  int m_consensus_takeEachRange;
-		  int m_consensus_pow;
-	*/
+		int m_occupancyGrid_count;
 
+		int m_mapAltitude;
+		int m_useMapAltitude;
+		int m_maxDistanceInsertion;
+		double m_maxOccupancyUpdateCertainty;
+		int m_considerInvalidRangesAsFreeSpace;		  
+		int m_decimation;
+		double m_horizontalTolerance;
+		double m_CFD_features_gaussian_size;
+		double m_CFD_features_median_size;
+		int m_wideningBeamsWithDistance;
+
+		mrpt::slam::COccupancyGridMap2D::TLikelihoodMethod m_likelihoodMethod;			  
+		int m_enableLikelihoodCache;
+		int m_LF_decimation;
+		double m_LF_stdHit;
+		double m_LF_maxCorrsDistance;
+		double m_LF_zHit;
+		double m_LF_zRandom;
+		double m_LF_maxRange;
+		int m_LF_alternateAverageMethod;
+		int m_MI_exponent;
+		int m_MI_skip_rays;
+		int m_MI_ratio_max_distance;				
+		int m_rayTracing_useDistanceFilter;
+		int m_rayTracing_decimation;
+		double m_rayTracing_stdHit;
+		int m_consensus_takeEachRange;
+		int m_consensus_pow;
+	
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		

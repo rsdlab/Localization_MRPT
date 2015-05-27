@@ -35,8 +35,41 @@ void  MCLocalization_MRPT::initialize(){
 	pdf_.options.KLD_params.KLD_maxSampleSize =		m_KLD_maxSampleSize;
 	pdf_.options.KLD_params.KLD_minSampleSize =		m_KLD_minSampleSize;
 	pdf_.options.KLD_params.KLD_minSamplesPerBin =	m_KLD_minSamplesPerBin;
+	 
+	// m_resolution
+	m_map.insertionOptions.mapAltitude = m_mapAltitude;
+	m_map.insertionOptions.useMapAltitude = m_useMapAltitude;
+	m_map.insertionOptions.maxDistanceInsertion = m_maxDistanceInsertion;
+	m_map.insertionOptions.maxOccupancyUpdateCertainty = m_maxOccupancyUpdateCertainty;
+	m_map.insertionOptions.considerInvalidRangesAsFreeSpace = m_considerInvalidRangesAsFreeSpace;
+	m_map.insertionOptions.decimation = m_decimation;
+	m_map.insertionOptions.horizontalTolerance =  m_horizontalTolerance;
+	m_map.insertionOptions.CFD_features_gaussian_size = m_CFD_features_gaussian_size;
+	m_map.insertionOptions.CFD_features_median_size = m_CFD_features_median_size;
+	m_map.insertionOptions.wideningBeamsWithDistance = m_wideningBeamsWithDistance;
+	m_map.insertionOptions.dumpToConsole();
+	
+	m_map.likelihoodOptions.likelihoodMethod = m_likelihoodMethod;	
+	m_map.likelihoodOptions.enableLikelihoodCache = m_enableLikelihoodCache;
+	m_map.likelihoodOptions.LF_decimation= m_LF_decimation;
+	m_map.likelihoodOptions.LF_stdHit= m_LF_stdHit;
+	m_map.likelihoodOptions.LF_maxCorrsDistance=  m_LF_maxCorrsDistance;
+	m_map.likelihoodOptions.LF_zHit= m_LF_zHit;
+	m_map.likelihoodOptions.LF_zRandom=  m_LF_zRandom;
+	m_map.likelihoodOptions.LF_maxRange=  m_LF_maxRange;
+	m_map.likelihoodOptions.LF_alternateAverageMethod= m_LF_alternateAverageMethod;
+	m_map.likelihoodOptions.MI_exponent= m_MI_exponent;
+	m_map.likelihoodOptions.MI_skip_rays= m_MI_skip_rays;
+	m_map.likelihoodOptions.MI_ratio_max_distance= m_MI_ratio_max_distance;		
+	m_map.likelihoodOptions.rayTracing_useDistanceFilter= m_rayTracing_useDistanceFilter;
+	m_map.likelihoodOptions.rayTracing_decimation= m_rayTracing_decimation;
+	m_map.likelihoodOptions.rayTracing_stdHit= m_rayTracing_stdHit;
+	m_map.likelihoodOptions.consensus_takeEachRange= m_consensus_takeEachRange;
+	m_map.likelihoodOptions.consensus_pow= m_consensus_pow;	
+	m_map.likelihoodOptions.dumpToConsole();
 
 	pdf_.options.metricMap = &m_map;
+
 	///
 	motion_model_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
 	motion_model_options_.gausianModel.minStdXY  = m_minStdXY;
