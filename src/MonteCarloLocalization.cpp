@@ -16,50 +16,66 @@ void  MCLocalization_MRPT::setMap(const OGMap& map){
 }
 
 void  MCLocalization_MRPT::initialize(){
-	///
-	//pfOptions_.PF_algorithm = CParticleFilter::TParticleFilterAlgorithm.pfStandardProposal;
-	//pfOptions_.resamplingMethod = CParticleFilter::TParticleResamplingAlgorithm.prMultinomial;
-	pfOptions_.adaptiveSampleSize = 1;
-	pfOptions_.pfAuxFilterOptimal_MaximumSearchSamples = 10;
-	pfOptions_.BETA = 0.5;
-	pfOptions_.sampleSize = 1;
+	pfOptions_.PF_algorithm = m_PF_algorithm;
+	pfOptions_.resamplingMethod = m_resamplingMethod;
+	pfOptions_.adaptiveSampleSize = m_adaptiveSampleSize;
+	pfOptions_.pfAuxFilterOptimal_MaximumSearchSamples = m_pfAuxFilterOptimal_MaximumSearchSamples;
+	pfOptions_.BETA = m_BETA;
+	pfOptions_.sampleSize = m_sampleSize;
     pfOptions_.dumpToConsole();
  
     pf_.m_options = pfOptions_;
 	
 	///
 	pdf_.clear();
-	pdf_.options.KLD_params.KLD_binSize_PHI=20;
-	pdf_.options.KLD_params.KLD_binSize_XY=0.20;
-	pdf_.options.KLD_params.KLD_delta = 0.02;
-	pdf_.options.KLD_params.KLD_epsilon =0.02;
-	pdf_.options.KLD_params.KLD_maxSampleSize =1000;
-	pdf_.options.KLD_params.KLD_minSampleSize = 150;
-	pdf_.options.KLD_params.KLD_minSamplesPerBin = 0;
-
-    pdf_.options.metricMap = &m_map;
+	pdf_.options.KLD_params.KLD_binSize_PHI =		m_KLD_binSize_PHI;
+	pdf_.options.KLD_params.KLD_binSize_XY =		m_KLD_binSize_XY;
+	pdf_.options.KLD_params.KLD_delta =				m_KLD_delta;
+	pdf_.options.KLD_params.KLD_epsilon =			m_KLD_epsilon;
+	pdf_.options.KLD_params.KLD_maxSampleSize =		m_KLD_maxSampleSize;
+	pdf_.options.KLD_params.KLD_minSampleSize =		m_KLD_minSampleSize;
+	pdf_.options.KLD_params.KLD_minSamplesPerBin =	m_KLD_minSamplesPerBin;
+	 
+	// m_resolution
+	m_map.insertionOptions.mapAltitude = m_mapAltitude;
+	m_map.insertionOptions.useMapAltitude = m_useMapAltitude;
+	m_map.insertionOptions.maxDistanceInsertion = m_maxDistanceInsertion;
+	m_map.insertionOptions.maxOccupancyUpdateCertainty = m_maxOccupancyUpdateCertainty;
+	m_map.insertionOptions.considerInvalidRangesAsFreeSpace = m_considerInvalidRangesAsFreeSpace;
+	m_map.insertionOptions.decimation = m_decimation;
+	m_map.insertionOptions.horizontalTolerance =  m_horizontalTolerance;
+	m_map.insertionOptions.CFD_features_gaussian_size = m_CFD_features_gaussian_size;
+	m_map.insertionOptions.CFD_features_median_size = m_CFD_features_median_size;
+	m_map.insertionOptions.wideningBeamsWithDistance = m_wideningBeamsWithDistance;
+	m_map.insertionOptions.dumpToConsole();
 	
+	m_map.likelihoodOptions.likelihoodMethod = m_likelihoodMethod;	
+	m_map.likelihoodOptions.enableLikelihoodCache = m_enableLikelihoodCache;
+	m_map.likelihoodOptions.LF_decimation= m_LF_decimation;
+	m_map.likelihoodOptions.LF_stdHit= m_LF_stdHit;
+	m_map.likelihoodOptions.LF_maxCorrsDistance=  m_LF_maxCorrsDistance;
+	m_map.likelihoodOptions.LF_zHit= m_LF_zHit;
+	m_map.likelihoodOptions.LF_zRandom=  m_LF_zRandom;
+	m_map.likelihoodOptions.LF_maxRange=  m_LF_maxRange;
+	m_map.likelihoodOptions.LF_alternateAverageMethod= m_LF_alternateAverageMethod;
+	m_map.likelihoodOptions.MI_exponent= m_MI_exponent;
+	m_map.likelihoodOptions.MI_skip_rays= m_MI_skip_rays;
+	m_map.likelihoodOptions.MI_ratio_max_distance= m_MI_ratio_max_distance;		
+	m_map.likelihoodOptions.rayTracing_useDistanceFilter= m_rayTracing_useDistanceFilter;
+	m_map.likelihoodOptions.rayTracing_decimation= m_rayTracing_decimation;
+	m_map.likelihoodOptions.rayTracing_stdHit= m_rayTracing_stdHit;
+	m_map.likelihoodOptions.consensus_takeEachRange= m_consensus_takeEachRange;
+	m_map.likelihoodOptions.consensus_pow= m_consensus_pow;	
+	m_map.likelihoodOptions.dumpToConsole();
+
+	pdf_.options.metricMap = &m_map;
+
 	///
 	motion_model_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
-	motion_model_options_.gausianModel.minStdXY  = 0.10;
-	motion_model_options_.gausianModel.minStdPHI = 2.0;
-	/*
-	motion_model_default_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
-    motion_model_default_options_.gausianModel.minStdXY  = 0.10;
-    motion_model_default_options_.gausianModel.minStdPHI = 2.0;
-	*/
-	
-	float min_x = -0.01;
-    float max_x =  0.01;
-    float min_y = -0.01;
-    float max_y =  0.01;
-    float min_phi = 0.05;
-    float max_phi = -0.05;
-	this->m_range_max = 10.0;
-	this->m_range_min = 0.3;
-	
-    pdf_.resetUniformFreeSpace(&m_map, 0.7f, 1000, min_x, max_x, min_y, max_y);
-	
+	motion_model_options_.gausianModel.minStdXY  = m_minStdXY;
+	motion_model_options_.gausianModel.minStdPHI = m_minStdPHI;
+
+	pdf_.resetUniformFreeSpace(&m_map, 0.7f, m_particles_count, m_min_x, m_max_x, m_min_y, m_max_y);//, m_min_phi, m_max_phi);
 }
 
 bool MCLocalization_MRPT::addPose(const ssr::Pose2D& deltaPose)
@@ -102,7 +118,6 @@ bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 
 CPose2D MCLocalization_MRPT::getEstimatedPose(){
     pf_.executeOn(pdf_,& m_ActionCollection,& m_SensoryFrame, &pf_stats_);
-  
 	return pdf_.getMeanVal();
 }
 
@@ -123,15 +138,21 @@ void MCLocalization_MRPT::OGMap2COccupancyGridMap(OGMap ogmap, COccupancyGridMap
 	
 			if(cell < 100){
 				gridmap->setCell(j, i, 0.0);
-			}
-			else if(cell > 200){
+			}else if(cell > 200){
 				gridmap->setCell(j, i, 1.0);
-			}
-			else{
-				gridmap->setCell(j, i, 1.0);
+			}else{
+				//gridmap->setCell(j, i, 0.5);未知領域をグレーに
+				gridmap->setCell(j, i, 1.0);//未知領域を白に
 			}
 		}
 	}
+	/*
+	CImage		img;
+	gridmap->getAsImage(img,false, true);  
+	mrpt::gui::CDisplayWindow	win("Computed path");
+	win.showImage(img.scaleDouble().scaleDouble());
+	win.waitForKey();
+	//*/
 }
 
 void MCLocalization_MRPT::TimedPose2D2CPose2D(const TimedPose2D & tp, CPose2D & cp, const RTC::OGMap & map){

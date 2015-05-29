@@ -10,9 +10,9 @@
 #   --module-desc='Localization MRPT Component' --module-version=1.0.0 --module-vendor=Sugar Sweet Robotics 
 #   --module-category=Navigatio --module-comp-type=STATIC 
 #   --module-act-type=PERIODIC --module-max-inst=1 
-#   --config=debug:int:0 
+#   --config=min_x:float:-0.01 --config=max_x:float:0.01 --config=min_y:float:-0.01 --config=max_y:float:0.01 --config=min_phi:float:0.05 --config=max_phi:float:-0.05 --config=range_min:float:0.3 --config=range_max:float:10 
 #   --inport=range:RTC::RangeData --inport=odometry:RTC::TimedPose2D --outport=estimatedPose:RTC::TimedPose2D 
-#   --consumer-idl=C:\Users\ysuga\rtm\idl\MobileRobot.idl 
+#   --consumer-idl=C:\Users\ogata\Desktop\MappingRTCs\Localization_MRPT\idl\MobileRobot.idl 
 #   --consumer=mapServer:OGMapServer:RTC::OGMapServer 
 
 
@@ -157,10 +157,178 @@ Lang Type:
 ======================================================================
 # <rtc-template block="configuration">
 	Configuration:
-		Name:             debug
+		Name:             min_x
+		Description:     
+		Type:            float
+		DefaultValue:     -0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             max_x
+		Description:     
+		Type:            float
+		DefaultValue:     0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             min_y
+		Description:     
+		Type:            float
+		DefaultValue:     -0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             max_y
+		Description:     
+		Type:            float
+		DefaultValue:     0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             min_phi
+		Description:     
+		Type:            float
+		DefaultValue:     -0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             max_phi
+		Description:     
+		Type:            float
+		DefaultValue:     0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             range_min
+		Description:     
+		Type:            float
+		DefaultValue:     0.3
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             range_max
+		Description:     
+		Type:            float
+		DefaultValue:     10
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             gausianModel_minStdXY
+		Description:     
+		Type:            float
+		DefaultValue:     0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             gausianModel_minStdPHI
+		Description:     
+		Type:            float
+		DefaultValue:     0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             KLD_binSize_PHI
+		Description:     
+		Type:            float
+		DefaultValue:     0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             KLD_binSize_XY
+		Description:     
+		Type:            float
+		DefaultValue:     0.01
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             KLD_delta
+		Description:     
+		Type:            float
+		DefaultValue:     0.02
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             KLD_epsilon
+		Description:     
+		Type:            float
+		DefaultValue:     0.02
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             KLD_maxSampleSize
 		Description:     
 		Type:            int
+		DefaultValue:     1000
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             KLD_minSampleSize
+		Description:     
+		Type:            int
+		DefaultValue:     150
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             KLD_minSamplesPerBin
+		Description:     
+		Type:            double
 		DefaultValue:     0
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             adaptiveSampleSize
+		Description:     
+		Type:            bool
+		DefaultValue:     1
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             pfAuxFilterOptimal_MaximumSearchSamples
+		Description:     
+		Type:            int
+		DefaultValue:     10
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             BETA
+		Description:     
+		Type:            double
+		DefaultValue:     0.5
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             sampleSize
+		Description:     
+		Type:            int
+		DefaultValue:     1
+		Unit:            
+		Range:           
+		Constraint:      
+
+		Name:             poseTimeOut
+		Description:     
+		Type:            float
+		DefaultValue:     3.0
 		Unit:            
 		Range:           
 		Constraint:      

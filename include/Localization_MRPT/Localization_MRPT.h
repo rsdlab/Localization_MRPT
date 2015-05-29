@@ -21,6 +21,7 @@
 
 using namespace RTC;
 using namespace std;
+	
 
 
 // Service implementation headers
@@ -230,10 +231,188 @@ class Localization_MRPT
   // <rtc-template block="config_declare">
   /*!
    * 
-   * - Name:  debug
+   * - Name:  min_x
+   * - DefaultValue: -0.01
+   */
+  float m_min_x;
+  /*!
+   * 
+   * - Name:  max_x
+   * - DefaultValue: 0.01
+   */
+  float m_max_x;
+  /*!
+   * 
+   * - Name:  min_y
+   * - DefaultValue: -0.01
+   */
+  float m_min_y;
+  /*!
+   * 
+   * - Name:  max_y
+   * - DefaultValue: 0.01
+   */
+  float m_max_y;
+  /*!
+   * 
+   * - Name:  min_phi
+   * - DefaultValue: -0.01
+   */
+  float m_min_phi;
+  /*!
+   * 
+   * - Name:  max_phi
+   * - DefaultValue: 0.01
+   */
+  float m_max_phi;
+  /*!
+   * 
+   * - Name:  range_min
+   * - DefaultValue: 0.3
+   */
+  float m_range_min;
+  /*!
+   * 
+   * - Name:  range_max
+   * - DefaultValue: 10
+   */
+  float m_range_max;
+  /*!
+   * 
+   * - Name:  minStdXY
+   * - DefaultValue: 0.01
+   */
+  float m_minStdXY;
+  /*!
+   * 
+   * - Name:  minStdPHI
+   * - DefaultValue: 0.01
+   */
+  float m_minStdPHI;
+  /*!
+   * 
+   * - Name:  KLD_binSize_PHI
+   * - DefaultValue: 0.01
+   */
+  float m_KLD_binSize_PHI;
+  /*!
+   * 
+   * - Name:  KLD_binSize_XY
+   * - DefaultValue: 0.01
+   */
+  float m_KLD_binSize_XY;
+  /*!
+   * 
+   * - Name:  KLD_delta
+   * - DefaultValue: 0.02
+   */
+  float m_KLD_delta;
+  /*!
+   * 
+   * - Name:  KLD_epsilon
+   * - DefaultValue: 0.02
+   */
+  float m_KLD_epsilon;
+  /*!
+   * 
+   * - Name:  KLD_maxSampleSize
+   * - DefaultValue: 1000
+   */
+  int m_KLD_maxSampleSize;
+  /*!
+   * 
+   * - Name:  KLD_minSampleSize
+   * - DefaultValue: 150
+   */
+  int m_KLD_minSampleSize;
+  /*!
+   * 
+   * - Name:  KLD_minSamplesPerBin
    * - DefaultValue: 0
    */
-  int m_debug;
+  double m_KLD_minSamplesPerBin;
+  /*!
+   * 
+   * - Name:  adaptiveSampleSize
+   * - DefaultValue: 1
+   */
+  bool m_adaptiveSampleSize;
+  /*!
+   * 
+   * - Name:  pfAuxFilterOptimal_MaximumSearchSamples
+   * - DefaultValue: 10
+   */
+  int m_pfAuxFilterOptimal_MaximumSearchSamples;
+  /*!
+   * 
+   * - Name:  BETA
+   * - DefaultValue: 0.5
+   */
+  double m_BETA;
+  /*!
+   * 
+   * - Name:  sampleSize
+   * - DefaultValue: 1
+   */
+  int m_sampleSize;
+  /*!
+  // The Particle Filter algorithm:
+  //	0: pfStandardProposal	  ***
+  //	1: pfAuxiliaryPFStandard
+  //	2: pfOptimalProposal    
+  //	3: pfAuxiliaryPFOptimal	  ***
+  */
+  int m_PF_algorithm;
+  /*!
+  // The Particle Filter Resampling method:
+  //	0: prMultinomial
+  //	1: prResidual
+  //	2: prStratified
+  //	3: prSystematic
+  */
+  int m_resamplingMethod;
+  //std::string m_rawlog_file;
+  //std::string m_logOutput_dir;
+  int m_particles_count;
+  
+  int m_occupancyGrid_count;
+  int m_mapAltitude;
+  int m_useMapAltitude;
+  int m_maxDistanceInsertion;
+  double m_maxOccupancyUpdateCertainty;
+  int m_considerInvalidRangesAsFreeSpace;
+  int m_decimation;
+  double m_horizontalTolerance;
+  double m_CFD_features_gaussian_size;
+  double m_CFD_features_median_size;
+  int m_wideningBeamsWithDistance;
+
+  int m_likelihoodMethod;
+  int m_enableLikelihoodCache;
+  int m_LF_decimation;
+  double m_LF_stdHit;
+  double m_LF_maxCorrsDistance;
+  double m_LF_zHit;
+  double m_LF_zRandom;
+  double m_LF_maxRange;
+  int m_LF_alternateAverageMethod;
+  int m_MI_exponent;
+  int m_MI_skip_rays;
+  int m_MI_ratio_max_distance;				
+  int m_rayTracing_useDistanceFilter;
+  int m_rayTracing_decimation;
+  double m_rayTracing_stdHit;
+  int m_consensus_takeEachRange;
+  int m_consensus_pow;
+
+
+
+  /*!
+   * 
+   * - Name:  poseTimeOut
+   * - DefaultValue: 3.0
+   */
+  float m_poseTimeOut;
 
   // </rtc-template>
 
@@ -292,6 +471,17 @@ class Localization_MRPT
 
 
 	 bool m_odomUpdated, m_rangeUpdated;
+
+	 
+	 coil::TimeValue m_lastReceivedTime;
+
+	 enum LOCALIZATION_MODE{
+		 MODE_NORMAL,
+		 MODE_POSE_INVALID_VALUE,
+		 MODE_POSE_TIME_OUT
+	 };
+	 LOCALIZATION_MODE m_MODE;
+	 LOCALIZATION_MODE getMode(){return m_MODE;}
 };
 
 
