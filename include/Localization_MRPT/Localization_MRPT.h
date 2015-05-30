@@ -336,7 +336,7 @@ class Localization_MRPT
    * - Name:  adaptiveSampleSize
    * - DefaultValue: 1
    */
-  bool m_adaptiveSampleSize;
+  int m_adaptiveSampleSize;
   /*!
    * 
    * - Name:  pfAuxFilterOptimal_MaximumSearchSamples
