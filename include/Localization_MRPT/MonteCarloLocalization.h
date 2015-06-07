@@ -5,19 +5,26 @@
 #include <mrpt/gui.h>
 
 #include <mrpt/bayes/CParticleFilter.h>
-#include <mrpt/slam/CActionRobotMovement2D.h>
-#include <mrpt/slam/CMultiMetricMap.h>
+
 #include <mrpt/poses/CPose2D.h>
 #include <mrpt/poses/CPosePDFGaussian.h>
 #include <mrpt/utils/CTicTac.h>
-#include <mrpt/slam/CMultiMetricMap.h>
-#include <mrpt/slam/CActionCollection.h>
+
+
 #include <mrpt/slam/CMonteCarloLocalization2D.h>
-#include <mrpt/slam/CObservationOdometry.h>
-#include <mrpt/slam/CSensoryFrame.h>
+
+#include <mrpt/maps/COccupancyGridMap2D.h>
+#include <mrpt/maps/CMultiMetricMap.h>
+
+#include <mrpt/obs/CActionRobotMovement2D.h>
+#include <mrpt/obs/CObservation2DRangeScan.h>
+#include <mrpt/obs/CSensoryFrame.h>
+#include <mrpt/obs/CObservationOdometry.h>
+#include <mrpt/obs/CActionCollection.h>
 #include <mrpt/utils/CTicTac.h>
 #include <mrpt/poses/CPose2D.h>
 
+/*
 using namespace RTC;
 
 using namespace mrpt;
@@ -28,7 +35,9 @@ using namespace mrpt::math;
 using namespace mrpt::system;
 using namespace mrpt::utils;
 using namespace mrpt::random;
+using namespace mrpt::poses;
 using namespace std;
+*/
 	
 namespace ssr{
 
@@ -234,19 +243,19 @@ namespace ssr{
 	*/
 	class MCLocalization_MRPT{
 	public:
-		COccupancyGridMap2D m_map;
+                mrpt::maps::COccupancyGridMap2D m_map;
 		//CMultiMetricMap m_metricmap;
-		CMonteCarloLocalization2D pdf_;
-		CParticleFilter::TParticleFilterOptions pfOptions_;		
-		CParticleFilter::TParticleFilterStats pf_stats_;
-		CParticleFilter pf_;
+		mrpt::slam::CMonteCarloLocalization2D pdf_;
+		mrpt::bayes::CParticleFilter::TParticleFilterOptions pfOptions_;		
+		mrpt::bayes::CParticleFilter::TParticleFilterStats pf_stats_;
+		mrpt::bayes::CParticleFilter pf_;
 		//PFStates state_;
 
-		CActionRobotMovement2D::TMotionModelOptions motion_model_options_;
-		CActionRobotMovement2D::TMotionModelOptions motion_model_default_options_;
+		mrpt::obs::CActionRobotMovement2D::TMotionModelOptions motion_model_options_;
+		mrpt::obs::CActionRobotMovement2D::TMotionModelOptions motion_model_default_options_;
 
- 		mrpt::slam::CActionCollection m_ActionCollection;
-		mrpt::slam::CSensoryFrame m_SensoryFrame;
+ 		mrpt::obs::CActionCollection m_ActionCollection;
+		mrpt::obs::CSensoryFrame m_SensoryFrame;
 		mrpt::poses::CPose3D m_RangeSensorPose;
 		mrpt::poses::CPosePDFGaussian initialPose_;
 
@@ -307,7 +316,7 @@ namespace ssr{
 		double m_CFD_features_median_size;
 		int m_wideningBeamsWithDistance;
 
-		mrpt::slam::COccupancyGridMap2D::TLikelihoodMethod m_likelihoodMethod;			  
+		mrpt::maps::COccupancyGridMap2D::TLikelihoodMethod m_likelihoodMethod;			  
 		int m_enableLikelihoodCache;
 		int m_LF_decimation;
 		double m_LF_stdHit;
@@ -331,7 +340,7 @@ namespace ssr{
 		MCLocalization_MRPT();
 		~MCLocalization_MRPT();
 
-		void setMap(const OGMap& map);
+		void setMap(const RTC::OGMap& map);
 		void initialize();
 		bool setRangeSensorPosition(const ssr::Position3D& position) {
 		m_RangeSensorPose = mrpt::poses::CPose3D(position.x, position.y, position.z, position.roll, position.pitch, position.yaw);
@@ -344,12 +353,12 @@ namespace ssr{
 			m_range_min = min;
 			m_range_max = max;
 		}
-		CPose2D getEstimatedPose();
+		mrpt::poses::CPose2D getEstimatedPose();
 
 	protected:
 		void configureFilter(const mrpt::utils::CConfigFile &_configFile);
-		void OGMap2COccupancyGridMap(RTC::OGMap ogmap, COccupancyGridMap2D *gridmap);
-		void TimedPose2D2CPose2D(const TimedPose2D & tp, CPose2D & cp, const RTC::OGMap & map);
+		void OGMap2COccupancyGridMap(RTC::OGMap ogmap, mrpt::maps::COccupancyGridMap2D *gridmap);
+		void TimedPose2D2CPose2D(const RTC::TimedPose2D & tp, mrpt::poses::CPose2D & cp, const RTC::OGMap & map);
 	};
 
 };

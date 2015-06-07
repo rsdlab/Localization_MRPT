@@ -11,7 +11,7 @@ MCLocalization_MRPT::~MCLocalization_MRPT(){
 	//destractor 
 }
 
-void  MCLocalization_MRPT::setMap(const OGMap& map){
+void  MCLocalization_MRPT::setMap(const RTC::OGMap& map){
 	OGMap2COccupancyGridMap(map, &m_map);
 }
 
@@ -71,7 +71,7 @@ void  MCLocalization_MRPT::initialize(){
 	pdf_.options.metricMap = &m_map;
 
 	///
-	motion_model_options_.modelSelection = CActionRobotMovement2D::mmGaussian;
+	motion_model_options_.modelSelection = mrpt::obs::CActionRobotMovement2D::mmGaussian;
 	motion_model_options_.gausianModel.minStdXY  = m_minStdXY;
 	motion_model_options_.gausianModel.minStdPHI = m_minStdPHI;
 
@@ -80,11 +80,11 @@ void  MCLocalization_MRPT::initialize(){
 
 bool MCLocalization_MRPT::addPose(const ssr::Pose2D& deltaPose)
 {
-	CActionRobotMovement2D action;
-	CActionRobotMovement2D::TMotionModelOptions options;
-	action.computeFromOdometry(CPose2D(deltaPose.x, deltaPose.y, deltaPose.th), motion_model_options_);
+        mrpt::obs::CActionRobotMovement2D action;
+	mrpt::obs::CActionRobotMovement2D::TMotionModelOptions options;
+	action.computeFromOdometry(mrpt::poses::CPose2D(deltaPose.x, deltaPose.y, deltaPose.th), motion_model_options_);
 	action.timestamp = mrpt::system::getCurrentTime();
-	static TTimeStamp oldTimestamp;
+	static mrpt::system::TTimeStamp oldTimestamp;
 	if(action.timestamp == oldTimestamp) {
 		action.timestamp = oldTimestamp +1;
 	}
@@ -96,7 +96,7 @@ bool MCLocalization_MRPT::addPose(const ssr::Pose2D& deltaPose)
 
 bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 {
-	CObservation2DRangeScanPtr observation = CObservation2DRangeScan::Create();
+  mrpt::obs::CObservation2DRangeScanPtr observation = mrpt::obs::CObservation2DRangeScan::Create();
 	observation->rightToLeft = true;
 	observation->validRange.resize(range.size);
 	observation->scan.resize(range.size);
@@ -116,12 +116,12 @@ bool MCLocalization_MRPT::addRange(const ssr::Range& range)
 	return true;
 }
 
-CPose2D MCLocalization_MRPT::getEstimatedPose(){
+mrpt::poses::CPose2D MCLocalization_MRPT::getEstimatedPose(){
     pf_.executeOn(pdf_,& m_ActionCollection,& m_SensoryFrame, &pf_stats_);
 	return pdf_.getMeanVal();
 }
 
-void MCLocalization_MRPT::OGMap2COccupancyGridMap(OGMap ogmap, COccupancyGridMap2D *gridmap) {
+void MCLocalization_MRPT::OGMap2COccupancyGridMap(RTC::OGMap ogmap, mrpt::maps::COccupancyGridMap2D *gridmap) {
 	gridmap->setSize(
 		-ogmap.config.origin.position.x,
 		ogmap.map.width * ogmap.config.xScale - ogmap.config.origin.position.x,
@@ -155,7 +155,7 @@ void MCLocalization_MRPT::OGMap2COccupancyGridMap(OGMap ogmap, COccupancyGridMap
 	//*/
 }
 
-void MCLocalization_MRPT::TimedPose2D2CPose2D(const TimedPose2D & tp, CPose2D & cp, const RTC::OGMap & map){
+void MCLocalization_MRPT::TimedPose2D2CPose2D(const RTC::TimedPose2D & tp, mrpt::poses::CPose2D & cp, const RTC::OGMap & map){
 		cp.x(map.map.column + tp.data.position.x / map.config.yScale);
 		cp.y(map.map.row + tp.data.position.y / map.config.yScale);
 		cp.phi(tp.data.heading);
