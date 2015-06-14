@@ -19,7 +19,7 @@ static const char* localization_mrpt_spec[] =
     "description",       "Localization MRPT Component",
     "version",           "1.0.0",
     "vendor",            "Sugar Sweet Robotics",
-    "category",          "Navigatio",
+    "category",          "Navigation",
     "activity_type",     "PERIODIC",
     "kind",              "DataFlowComponent",
     "max_instance",      "1",
@@ -430,11 +430,10 @@ RTC::ReturnCode_t Localization_MRPT::onExecute(RTC::UniqueId ec_id)
   if(m_rangeUpdated && m_odomUpdated) {
     CPose2D estPose;
     estPose = mcl.getEstimatedPose();
-   
 	m_estimatedPose.data.position.x = estPose.x();
 	m_estimatedPose.data.position.y = estPose.y();
 	m_estimatedPose.data.heading    = estPose.phi();
-	
+	setTimestamp<TimedPose2D>(m_estimatedPose);
 	m_estimatedPoseOut.write();
   }
   

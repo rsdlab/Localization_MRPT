@@ -345,6 +345,7 @@ namespace ssr{
 			m_range_max = max;
 		}
 		CPose2D getEstimatedPose();
+			
 
 	protected:
 		void configureFilter(const mrpt::utils::CConfigFile &_configFile);
