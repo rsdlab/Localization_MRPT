@@ -78,7 +78,7 @@ void  MCLocalization_MRPT::initialize(){
 	//pdf_.resetUniformFreeSpace(&m_map, 0.7f, m_particles_count, m_min_x, m_max_x, m_min_y, m_max_y);//, m_min_phi, m_max_phi);
 	pdf_.resetUniform(m_map.getXMin(), m_map.getXMax(),
 			  m_map.getYMin(), m_map.getYMax(),
-			  -M_PI, M_PI, m_particles_count);//, m_min_phi, m_max_phi);
+			  -m_min_phi, m_max_phi, m_particles_count);//, m_min_phi, m_max_phi);
 }
 
 bool MCLocalization_MRPT::addPose(const ssr::Pose2D& deltaPose)
